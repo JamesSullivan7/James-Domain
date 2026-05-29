@@ -3,29 +3,31 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>THE VAULT — jamesdomain.org</title>
-<meta name="description" content="A vault. The links inside are the value." />
+<title>The Vault — jamesdomain.org</title>
+<meta name="description" content="A private collection." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
 <style>
   /* ============================================================
-     THEME — tweak these to reskin the whole vault
+     THEME — Luxe Museum
      ============================================================ */
   :root {
-    --bg:        #0a0a0b;
-    --bg-2:      #131316;
-    --steel:     #2a2c31;
-    --steel-2:   #3a3d44;
-    --brass:     #d4af37;
-    --brass-dim: #9c8128;
-    --amber:     #ffb000;
-    --crimson:   #c8503c;
-    --text:      #e7e3d8;
-    --muted:     #8a8779;
-    --green:     #4caf6d;
-    --red:       #e0533d;
-    --gray:      #6b6b6b;
-    --radius:    14px;
-    --font:      "Helvetica Neue", Arial, sans-serif;
-    --mono:      "SF Mono", "Roboto Mono", Menlo, Consolas, monospace;
+    --bg:        #0c0a09;
+    --bg-2:      #141110;
+    --panel:     #17130f;
+    --line:      #3a3327;   /* warm hairline */
+    --gold:      #c9a227;
+    --gold-lt:   #e6c965;
+    --cream:     #efe9dd;
+    --muted:     #9a907c;
+    --faint:     #6b6354;
+    --oxblood:   #9a5a4a;   /* restricted accent */
+    --sage:      #94a06f;   /* live */
+    --stone:     #8a8475;   /* archived */
+    --serif:     "Cormorant Garamond", Georgia, serif;
+    --sans:      "Jost", "Helvetica Neue", Arial, sans-serif;
+    --radius:    4px;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,316 +35,315 @@
 
   body {
     background:
-      radial-gradient(1200px 800px at 50% -10%, #1c1d22 0%, var(--bg) 55%),
+      radial-gradient(1100px 760px at 50% -8%, #1d1813 0%, var(--bg) 58%),
       var(--bg);
-    color: var(--text);
-    font-family: var(--font);
+    color: var(--cream);
+    font-family: var(--sans);
+    font-weight: 300;
     min-height: 100%;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
   }
+
+  /* very faint paper grain */
   body::before {
-    content: "";
-    position: fixed; inset: 0;
-    background-image:
-      linear-gradient(rgba(255,255,255,.015) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,.015) 1px, transparent 1px);
-    background-size: 42px 42px;
-    pointer-events: none; z-index: 0;
+    content:""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    opacity: .5;
+    background:
+      radial-gradient(circle at 20% 30%, rgba(201,162,39,.04), transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(201,162,39,.03), transparent 45%);
   }
+
+  .corner-frame::before, .corner-frame::after,
+  .corner-frame > .c1, .corner-frame > .c2 {
+    content:""; position:absolute; width:16px; height:16px; border:1px solid var(--gold);
+  }
+  .corner-frame::before { top:-1px;  left:-1px;  border-right:0; border-bottom:0; }
+  .corner-frame::after  { top:-1px;  right:-1px; border-left:0;  border-bottom:0; }
+  .corner-frame > .c1   { bottom:-1px; left:-1px;  border-right:0; border-top:0; }
+  .corner-frame > .c2   { bottom:-1px; right:-1px; border-left:0;  border-top:0; }
 
   /* ============================================================
-     SAFE / KEYPAD (shared by main lock + inner chamber)
+     KEYPAD (shared by entry + inner vault)
      ============================================================ */
-  .safe {
-    width: 320px; max-width: 92vw;
-    background: linear-gradient(160deg, var(--steel-2), var(--steel) 60%, #1c1e22);
-    border: 1px solid #4a4d55;
-    border-radius: 20px;
-    padding: 22px 22px 26px;
-    box-shadow:
-      0 30px 80px rgba(0,0,0,.6),
-      inset 0 1px 0 rgba(255,255,255,.08),
-      inset 0 -2px 8px rgba(0,0,0,.5);
-  }
-  .safe.inner { border-color: #6e3a32; }
-
-  .bolts { display:flex; justify-content:space-between; margin-bottom:16px; }
-  .bolt { width:9px; height:9px; border-radius:50%;
-    background: radial-gradient(circle at 35% 30%, #6a6d76, #232529);
-    box-shadow: inset 0 1px 1px rgba(255,255,255,.25); }
-  .safe.inner .bolt { background: radial-gradient(circle at 35% 30%, #a85a4c, #2a1714); }
+  .console { width: 340px; max-width: 92vw; }
 
   .readout {
-    font-family: var(--mono); font-size: 30px; letter-spacing: .35em;
-    text-align: center; color: var(--amber);
-    background: #0c0d0f; border: 1px solid #000; border-radius: 8px;
-    padding: 14px 10px; margin-bottom: 6px;
-    text-shadow: 0 0 12px rgba(255,176,0,.5);
-    box-shadow: inset 0 2px 10px rgba(0,0,0,.8);
-    min-height: 58px; user-select: none;
+    font-family: var(--serif);
+    font-size: 34px; letter-spacing: .5em; text-align: center;
+    color: var(--gold-lt); padding: 8px 0 4px; min-height: 50px;
+    text-indent: .5em; user-select: none;
   }
-  .readout.denied  { color: var(--red);   text-shadow: 0 0 12px rgba(224,83,61,.6); animation: shake .4s; }
-  .readout.granted { color: var(--green); text-shadow: 0 0 12px rgba(76,175,109,.6); }
-
+  .readout.denied  { color: var(--oxblood); animation: shake .4s; }
+  .readout.granted { color: var(--sage); }
   @keyframes shake {
-    0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)}
-    40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)}
+    0%,100%{transform:translateX(0)} 20%{transform:translateX(-7px)}
+    40%{transform:translateX(7px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)}
   }
 
   .status-line {
-    font-family: var(--mono); font-size: 11px; letter-spacing:.2em;
-    text-align:center; color: var(--muted); text-transform:uppercase;
-    min-height: 16px; margin-bottom: 16px;
+    text-align:center; font-size: 11px; letter-spacing:.42em; text-transform:uppercase;
+    color: var(--muted); min-height: 15px; margin-bottom: 22px; font-weight: 400;
   }
-  .status-line.denied  { color: var(--red); }
-  .status-line.granted { color: var(--green); }
+  .status-line.denied  { color: var(--oxblood); }
+  .status-line.granted { color: var(--sage); }
 
-  .keypad { display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .keypad { display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
   .key {
-    font-family: var(--mono); font-size: 22px; color: var(--text);
-    background: linear-gradient(180deg, #43464e, #2b2d33);
-    border: 1px solid #54575f; border-radius: 10px;
-    padding: 16px 0; cursor: pointer; user-select: none;
-    transition: transform .05s ease, background .15s ease;
-    box-shadow: 0 2px 0 #1c1e22, inset 0 1px 0 rgba(255,255,255,.08);
+    font-family: var(--serif); font-size: 26px; color: var(--cream);
+    background: transparent; border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 14px 0; cursor: pointer; user-select: none;
+    transition: border-color .25s ease, color .25s ease, background .25s ease;
   }
-  .key:hover  { background: linear-gradient(180deg, #4d505a, #34373d); }
-  .key:active { transform: translateY(2px); box-shadow: 0 0 0 #1c1e22, inset 0 1px 3px rgba(0,0,0,.5); }
-  .key.fn    { font-size: 16px; color: var(--brass); }
-  .key.enter { color: var(--green); }
+  .key:hover { border-color: var(--gold); color: var(--gold-lt); background: rgba(201,162,39,.05); }
+  .key:active { background: rgba(201,162,39,.12); }
+  .key.fn    { font-family: var(--sans); font-size: 12px; letter-spacing:.2em; color: var(--muted); }
+  .key.enter { font-family: var(--sans); color: var(--gold); }
 
   .hint {
-    margin-top: 18px; text-align:center;
-    font-family: var(--mono); font-size: 11px; letter-spacing:.15em; color: #5a5849;
+    margin-top: 20px; text-align:center; font-size: 11px; letter-spacing:.2em;
+    color: var(--faint); text-transform: uppercase;
   }
-  .hint b { color: var(--amber); }
+  .hint b { color: var(--gold-lt); font-weight: 500; }
 
   /* ============================================================
-     MAIN LOCK SCREEN
+     ENTRY SCREEN
      ============================================================ */
   #lockScreen {
-    position: fixed; inset: 0;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    gap: 26px; z-index: 10; padding: 24px;
-    transition: opacity .6s ease, transform .6s ease, filter .6s ease;
+    position: fixed; inset: 0; z-index: 10;
+    display:flex; align-items:center; justify-content:center; padding: 24px;
+    transition: opacity .7s ease, transform .7s ease, filter .7s ease;
   }
-  #lockScreen.opening { opacity: 0; transform: scale(1.08); filter: blur(6px); pointer-events: none; }
+  #lockScreen.opening { opacity: 0; transform: scale(1.04); filter: blur(5px); pointer-events: none; }
 
-  .brand-mark {
-    text-align: center; letter-spacing: .5em; text-transform: uppercase;
-    color: var(--muted); font-size: 12px; margin-bottom: 4px;
+  .entry {
+    position: relative; padding: 56px 56px 48px; text-align: center;
+    border: 1px solid var(--line); background: rgba(20,16,12,.45);
+    backdrop-filter: blur(2px);
   }
-  .brand-title {
-    text-align: center; font-size: clamp(34px, 7vw, 60px); font-weight: 800;
-    letter-spacing: .14em; color: var(--text); text-shadow: 0 2px 18px rgba(0,0,0,.6);
+  .kicker {
+    font-size: 11px; letter-spacing:.55em; text-transform:uppercase;
+    color: var(--gold); margin-bottom: 24px; font-weight: 400;
   }
-  .brand-title .glint {
-    background: linear-gradient(90deg, var(--brass-dim), var(--brass) 45%, #fff6cf 50%, var(--brass) 55%, var(--brass-dim));
-    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  .title {
+    font-family: var(--serif); font-weight: 500; line-height: .92;
+    font-size: clamp(64px, 12vw, 96px); letter-spacing:.01em;
+  }
+  .title em { font-style: italic; color: var(--gold-lt); }
+  .rule { width: 64px; height: 1px; margin: 26px auto 22px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+  .tagline {
+    font-size: 12px; letter-spacing:.42em; text-transform:uppercase;
+    color: var(--muted); margin-bottom: 40px;
   }
 
   /* ============================================================
      INNER-VAULT OVERLAY
      ============================================================ */
   #innerLock {
-    position: fixed; inset: 0; z-index: 50;
-    display: none; align-items: center; justify-content: center;
-    padding: 24px;
-    background: rgba(5,5,6,.82); backdrop-filter: blur(6px);
+    position: fixed; inset: 0; z-index: 50; display:none;
+    align-items:center; justify-content:center; padding: 24px;
+    background: rgba(7,5,4,.86); backdrop-filter: blur(7px);
   }
-  #innerLock.open { display: flex; animation: fade .3s ease; }
-  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
-  #innerLock .inner-wrap { display:flex; flex-direction:column; align-items:center; gap:18px; }
-  #innerLock .inner-kicker {
-    font-family: var(--mono); font-size: 11px; letter-spacing:.4em;
-    text-transform:uppercase; color: var(--crimson); text-align:center;
+  #innerLock.open { display:flex; animation: fade .35s ease; }
+  @keyframes fade { from { opacity:0 } to { opacity:1 } }
+  .reserve-entry {
+    position: relative; padding: 50px 56px 44px; text-align:center;
+    border: 1px solid #4a2e28; background: rgba(26,16,13,.6);
   }
+  .reserve-entry .kicker { color: var(--oxblood); }
+  .reserve-entry .readout { color: #d08a78; }
+  .reserve-entry .key:hover { border-color: var(--oxblood); color: #d08a78; background: rgba(154,90,74,.06); }
+  .reserve-entry .key.enter { color: var(--oxblood); }
+  .reserve-entry .corner-frame::before, .reserve-entry .corner-frame::after,
+  .reserve-entry .c1, .reserve-entry .c2 { border-color: var(--oxblood); }
   .close-x {
-    position: absolute; top: 22px; right: 26px;
-    font-family: var(--mono); font-size: 26px; color: var(--muted);
-    cursor: pointer; user-select:none; line-height:1;
+    position:absolute; top:22px; right:28px; font-family: var(--serif);
+    font-size:30px; color: var(--muted); cursor:pointer; user-select:none; line-height:1;
   }
-  .close-x:hover { color: var(--text); }
+  .close-x:hover { color: var(--cream); }
 
   /* ============================================================
-     VAULT INTERIOR
+     THE COLLECTION (vault interior)
      ============================================================ */
   #vault {
-    position: relative; z-index: 1; max-width: 1080px; margin: 0 auto;
-    padding: 70px 24px 90px;
-    opacity: 0; transform: translateY(20px); pointer-events: none;
-    transition: opacity .8s ease .2s, transform .8s ease .2s;
+    position: relative; z-index: 1; max-width: 1100px; margin: 0 auto;
+    padding: 90px 28px 100px;
+    opacity: 0; transform: translateY(18px); pointer-events: none;
+    transition: opacity .9s ease .2s, transform .9s ease .2s;
   }
   #vault.revealed { opacity: 1; transform: none; pointer-events: auto; }
 
-  .vault-header { text-align:center; margin-bottom: 54px; }
-  .vault-header .kicker {
-    font-family: var(--mono); font-size: 11px; letter-spacing:.45em;
-    text-transform:uppercase; color: var(--brass); margin-bottom: 14px;
+  .gallery-header { text-align:center; margin-bottom: 70px; }
+  .gallery-header .kicker { color: var(--gold); margin-bottom: 18px; }
+  .gallery-header h1 {
+    font-family: var(--serif); font-weight: 500; font-size: clamp(52px, 9vw, 88px);
+    letter-spacing:.02em; line-height: 1;
   }
-  .vault-header h1 { font-size: clamp(40px, 8vw, 76px); font-weight: 800; letter-spacing:.1em; }
-  .vault-header .sub { margin-top: 14px; color: var(--muted); font-size: 14px; letter-spacing:.1em; }
-  .rule { width: 60px; height: 2px; margin: 26px auto 0;
-    background: linear-gradient(90deg, transparent, var(--brass), transparent); }
+  .gallery-header h1 em { font-style: italic; color: var(--gold-lt); }
+  .gallery-header .sub {
+    margin-top: 18px; font-size: 13px; letter-spacing:.36em; text-transform:uppercase; color: var(--muted);
+  }
+  .gallery-header .rule { margin: 30px auto 0; }
 
   .grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px;
+    display:grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 22px;
   }
 
   .item {
-    position: relative; display: block; text-decoration: none; color: inherit;
-    background: linear-gradient(165deg, var(--bg-2), #0c0c0e);
-    border: 1px solid #26272c; border-radius: var(--radius);
-    padding: 22px 22px 20px; overflow: hidden;
-    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+    position: relative; display:block; text-decoration:none; color: inherit;
+    background: linear-gradient(165deg, var(--panel), #0e0b09);
+    border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 30px 30px 26px; overflow: hidden;
+    transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease;
     opacity: 0; transform: translateY(14px);
   }
-  .revealed .item { animation: rise .55s ease forwards; }
+  .revealed .item { animation: rise .7s ease forwards; }
   @keyframes rise { to { opacity:1; transform:none; } }
-
   .item:hover {
-    transform: translateY(-4px); border-color: var(--brass-dim);
-    box-shadow: 0 18px 40px rgba(0,0,0,.55), 0 0 0 1px rgba(212,175,55,.15);
+    transform: translateY(-5px); border-color: var(--gold);
+    box-shadow: 0 24px 50px rgba(0,0,0,.5), 0 0 0 1px rgba(201,162,39,.12);
   }
-  .item::after {
-    content:""; position:absolute; top:0; left:-60%; width:40%; height:100%;
-    background: linear-gradient(100deg, transparent, rgba(255,255,255,.07), transparent);
-    transform: skewX(-18deg); transition: left .6s ease;
+  /* gold corner tick on hover */
+  .item::before {
+    content:""; position:absolute; top:14px; right:14px; width:10px; height:10px;
+    border-top:1px solid var(--gold); border-right:1px solid var(--gold);
+    opacity:0; transition: opacity .3s ease;
   }
-  .item:hover::after { left: 130%; }
+  .item:hover::before { opacity:1; }
 
-  .item-top { display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; }
-  .item-no { font-family: var(--mono); font-size: 11px; letter-spacing:.18em; color: var(--brass); text-transform:uppercase; }
+  .item-top { display:flex; justify-content:space-between; align-items:baseline; margin-bottom: 18px; }
+  .item-no { font-size: 11px; letter-spacing:.3em; color: var(--gold); text-transform:uppercase; }
   .tag {
-    font-family: var(--mono); font-size: 10px; letter-spacing:.14em; text-transform:uppercase;
-    padding: 4px 9px; border-radius: 999px; border: 1px solid currentColor;
+    font-size: 10px; letter-spacing:.24em; text-transform:uppercase; color: var(--muted);
   }
-  .tag.live { color: var(--green); }
-  .tag.exp  { color: var(--amber); }
-  .tag.arch { color: var(--gray); }
-  .tag.wip  { color: var(--crimson); }
+  .tag::before { content:"— "; }
+  .tag.live { color: var(--sage); }
+  .tag.exp  { color: var(--gold); }
+  .tag.arch { color: var(--stone); }
+  .tag.wip  { color: var(--oxblood); }
 
-  .item h3 { font-size: 21px; font-weight: 700; letter-spacing:.02em; margin-bottom: 8px; }
-  .item p  { color: var(--muted); font-size: 14px; line-height: 1.5; }
+  .item h3 { font-family: var(--serif); font-weight: 500; font-size: 27px; letter-spacing:.01em; margin-bottom: 10px; }
+  .item p  { font-size: 14px; line-height: 1.6; color: var(--muted); }
   .item .go {
-    margin-top: 16px; font-family: var(--mono); font-size: 11px; letter-spacing:.18em;
-    color: var(--muted); text-transform:uppercase; display:flex; align-items:center; gap: 6px;
+    margin-top: 20px; font-size: 11px; letter-spacing:.3em; text-transform:uppercase;
+    color: var(--faint); transition: color .3s ease;
   }
-  .item:hover .go { color: var(--brass); }
+  .item:hover .go { color: var(--gold-lt); }
 
-  /* the door to the inner vault */
+  /* the door to the private reserve */
   .door {
-    position: relative; display:flex; flex-direction:column; justify-content:center;
-    align-items:center; text-align:center; cursor: pointer;
-    background: repeating-linear-gradient(45deg, #141112, #141112 12px, #18110f 12px, #18110f 24px);
-    border: 1px dashed var(--crimson); border-radius: var(--radius);
-    padding: 22px; min-height: 150px;
-    transition: transform .18s ease, box-shadow .18s ease;
+    position:relative; display:flex; flex-direction:column; justify-content:center; align-items:center;
+    text-align:center; cursor:pointer; min-height: 170px; padding: 30px;
+    border: 1px solid #4a2e28; border-radius: var(--radius);
+    background: linear-gradient(165deg, #190f0c, #0e0907);
+    transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
     opacity:0; transform: translateY(14px);
   }
-  .revealed .door { animation: rise .55s ease forwards; }
-  .door:hover { transform: translateY(-4px); box-shadow: 0 18px 40px rgba(0,0,0,.5), 0 0 0 1px rgba(200,80,60,.25); }
-  .door .lock-ico { font-size: 26px; margin-bottom: 10px; filter: drop-shadow(0 0 8px rgba(200,80,60,.5)); }
-  .door h3 { font-size: 16px; letter-spacing:.18em; text-transform:uppercase; color: var(--crimson); }
-  .door p { margin-top: 8px; font-family: var(--mono); font-size: 11px; letter-spacing:.15em; color: var(--muted); }
+  .revealed .door { animation: rise .7s ease forwards; }
+  .door:hover { transform: translateY(-5px); border-color: var(--oxblood);
+    box-shadow: 0 24px 50px rgba(0,0,0,.5), 0 0 0 1px rgba(154,90,74,.18); }
+  .door .key-ico { font-family: var(--serif); font-size: 30px; color: var(--oxblood); margin-bottom: 12px; }
+  .door h3 { font-family: var(--serif); font-style: italic; font-size: 22px; color: #c98a78; }
+  .door p  { margin-top:10px; font-size: 11px; letter-spacing:.28em; text-transform:uppercase; color: var(--muted); }
 
   /* ============================================================
-     INNER CHAMBER (revealed after second code)
+     PRIVATE RESERVE (hidden chamber)
      ============================================================ */
-  #chamber { margin-top: 70px; display: none; }
-  #chamber.revealed { display: block; }
-  .chamber-divider {
-    display:flex; align-items:center; gap:16px; margin-bottom: 40px;
-    color: var(--crimson);
+  #chamber { margin-top: 86px; display:none; }
+  #chamber.revealed { display:block; }
+  .reserve-divider { text-align:center; margin-bottom: 56px; }
+  .reserve-divider .label {
+    font-family: var(--serif); font-style: italic; font-size: 30px; color: #c98a78;
   }
-  .chamber-divider::before, .chamber-divider::after {
-    content:""; flex:1; height:1px;
-    background: linear-gradient(90deg, transparent, var(--crimson), transparent);
+  .reserve-divider .meta {
+    margin-top: 8px; font-size: 11px; letter-spacing:.34em; text-transform:uppercase; color: var(--muted);
   }
-  .chamber-divider span {
-    font-family: var(--mono); font-size: 12px; letter-spacing:.4em; text-transform:uppercase; white-space:nowrap;
+  .reserve-divider .r {
+    width: 56px; height: 1px; margin: 22px auto 0;
+    background: linear-gradient(90deg, transparent, var(--oxblood), transparent);
   }
-  #chamber .item { border-color: #3a201c; }
-  #chamber .item:hover { border-color: var(--crimson); box-shadow: 0 18px 40px rgba(0,0,0,.55), 0 0 0 1px rgba(200,80,60,.2); }
-  #chamber.revealed .item { animation: rise .55s ease forwards; }
+  #chamber .item { border-color: #36211c; }
+  #chamber .item:hover { border-color: var(--oxblood); box-shadow: 0 24px 50px rgba(0,0,0,.5), 0 0 0 1px rgba(154,90,74,.15); }
+  #chamber .item::before { border-color: var(--oxblood); }
+  #chamber .item-no { color: var(--oxblood); }
+  #chamber.revealed .item { animation: rise .7s ease forwards; }
 
-  .vault-footer {
-    margin-top: 60px; text-align:center;
-    font-family: var(--mono); font-size: 11px; letter-spacing:.2em; color: #4f4d42; text-transform:uppercase;
+  .gallery-footer {
+    margin-top: 80px; text-align:center; font-size: 11px; letter-spacing:.32em;
+    text-transform:uppercase; color: var(--faint);
   }
-  .vault-footer .dot { color: var(--brass); }
+  .gallery-footer .dot { color: var(--gold); margin: 0 8px; }
 </style>
 </head>
 <body>
 
-  <!-- ===================== MAIN LOCK SCREEN ===================== -->
+  <!-- ===================== ENTRY ===================== -->
   <section id="lockScreen">
-    <div>
-      <div class="brand-mark">jamesdomain.org</div>
-      <div class="brand-title">THE <span class="glint">VAULT</span></div>
-    </div>
+    <div class="entry corner-frame" data-keypad="main">
+      <span class="c1"></span><span class="c2"></span>
+      <div class="kicker">jamesdomain.org</div>
+      <div class="title">The <em>Vault</em></div>
+      <div class="rule"></div>
+      <div class="tagline">A Private Collection</div>
 
-    <div class="safe" data-keypad="main">
-      <div class="bolts">
-        <span class="bolt"></span><span class="bolt"></span><span class="bolt"></span>
-        <span class="bolt"></span><span class="bolt"></span><span class="bolt"></span>
-      </div>
-      <div class="readout">––––</div>
-      <div class="status-line">ENTER ACCESS CODE</div>
-      <div class="keypad">
-        <div class="key" data-k="1">1</div><div class="key" data-k="2">2</div><div class="key" data-k="3">3</div>
-        <div class="key" data-k="4">4</div><div class="key" data-k="5">5</div><div class="key" data-k="6">6</div>
-        <div class="key" data-k="7">7</div><div class="key" data-k="8">8</div><div class="key" data-k="9">9</div>
-        <div class="key fn" data-k="clear">CLR</div><div class="key" data-k="0">0</div><div class="key enter" data-k="enter">✓</div>
-      </div>
-      <!-- Remove this hint before going public -->
-      <div class="hint">DEMO CODE — <b>0007</b></div>
-    </div>
-  </section>
-
-  <!-- ===================== INNER-VAULT OVERLAY ===================== -->
-  <div id="innerLock">
-    <span class="close-x" id="innerClose">✕</span>
-    <div class="inner-wrap">
-      <div class="inner-kicker">⚠ Inner Vault · Restricted</div>
-      <div class="safe inner" data-keypad="inner">
-        <div class="bolts">
-          <span class="bolt"></span><span class="bolt"></span><span class="bolt"></span>
-          <span class="bolt"></span><span class="bolt"></span><span class="bolt"></span>
-        </div>
-        <div class="readout">––––</div>
-        <div class="status-line">ENTER INNER CODE</div>
+      <div class="console">
+        <div class="readout">····</div>
+        <div class="status-line">Enter Access Code</div>
         <div class="keypad">
           <div class="key" data-k="1">1</div><div class="key" data-k="2">2</div><div class="key" data-k="3">3</div>
           <div class="key" data-k="4">4</div><div class="key" data-k="5">5</div><div class="key" data-k="6">6</div>
           <div class="key" data-k="7">7</div><div class="key" data-k="8">8</div><div class="key" data-k="9">9</div>
-          <div class="key fn" data-k="clear">CLR</div><div class="key" data-k="0">0</div><div class="key enter" data-k="enter">✓</div>
+          <div class="key fn" data-k="clear">Clear</div><div class="key" data-k="0">0</div><div class="key enter" data-k="enter">Enter</div>
         </div>
-        <!-- Remove this hint before going public -->
-        <div class="hint">DEMO INNER CODE — <b>1342</b></div>
+        <!-- Remove before going public -->
+        <div class="hint">Demo Code — <b>0007</b></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PRIVATE RESERVE OVERLAY ===================== -->
+  <div id="innerLock">
+    <span class="close-x" id="innerClose">✕</span>
+    <div class="reserve-entry corner-frame" data-keypad="inner">
+      <span class="c1"></span><span class="c2"></span>
+      <div class="kicker">Private Reserve · By Invitation</div>
+      <div class="console">
+        <div class="readout">····</div>
+        <div class="status-line">Enter Reserve Code</div>
+        <div class="keypad">
+          <div class="key" data-k="1">1</div><div class="key" data-k="2">2</div><div class="key" data-k="3">3</div>
+          <div class="key" data-k="4">4</div><div class="key" data-k="5">5</div><div class="key" data-k="6">6</div>
+          <div class="key" data-k="7">7</div><div class="key" data-k="8">8</div><div class="key" data-k="9">9</div>
+          <div class="key fn" data-k="clear">Clear</div><div class="key" data-k="0">0</div><div class="key enter" data-k="enter">Enter</div>
+        </div>
+        <!-- Remove before going public -->
+        <div class="hint">Demo Code — <b>1342</b></div>
       </div>
     </div>
   </div>
 
-  <!-- ===================== VAULT INTERIOR ===================== -->
+  <!-- ===================== THE COLLECTION ===================== -->
   <main id="vault">
-    <header class="vault-header">
+    <header class="gallery-header">
       <div class="kicker">Access Granted</div>
-      <h1>THE VAULT</h1>
-      <div class="sub">A curated collection. The links inside are the value.</div>
+      <h1>The <em>Vault</em></h1>
+      <div class="sub">A curated collection · the works within are the value</div>
       <div class="rule"></div>
     </header>
 
     <div class="grid" id="grid"></div>
 
     <section id="chamber">
-      <div class="chamber-divider"><span>The Inner Vault · In Development</span></div>
+      <div class="reserve-divider">
+        <div class="label">The Private Reserve</div>
+        <div class="meta">In development · not yet unveiled</div>
+        <div class="r"></div>
+      </div>
       <div class="grid" id="chamberGrid"></div>
     </section>
 
-    <div class="vault-footer" id="footer"></div>
+    <div class="gallery-footer" id="footer"></div>
   </main>
 
 <script>
@@ -350,27 +351,26 @@
    CONFIG — the part you edit day to day
    ------------------------------------------------------------
    NOTE: these codes live in the page, so they are a fun gate,
-   NOT real security. Anyone viewing source can read them and
-   the hidden links. For genuinely private projects, protect the
-   deployment server-side (e.g. Vercel password protection).
+   NOT real security. For genuinely private projects, protect
+   the deployment server-side (e.g. Vercel password protection).
    ============================================================ */
 
-const VAULT_CODE = "0007";   // opens the main vault
-const INNER_CODE = "1342";   // opens the inner (work-in-progress) vault
+const VAULT_CODE = "0007";   // opens the collection
+const INNER_CODE = "1342";   // opens the private reserve
 
 // Public collection. tag: "live" | "exp" | "arch"
 const projects = [
   { name: "Aurora Notes",  url: "https://example.com", desc: "A calm, fast notes app with end-to-end sync.",         tag: "live" },
   { name: "Pixel Forge",   url: "https://example.com", desc: "Browser-based sprite & tilemap editor for game jams.", tag: "live" },
-  { name: "Tideline",      url: "https://example.com", desc: "Surf + tide forecasting dashboard, redesigned.",      tag: "live" },
+  { name: "Tideline",      url: "https://example.com", desc: "Surf & tide forecasting dashboard, redesigned.",      tag: "live" },
   { name: "Lab — Shaders", url: "https://example.com", desc: "A playground of WebGL experiments. Rough edges.",      tag: "exp"  },
   { name: "Coin Diary",    url: "https://example.com", desc: "An old budgeting tool. Kept for posterity.",          tag: "arch" },
 ];
 
-// Inner vault — unfinished work behind the second code. tag is forced to "wip".
+// Private reserve — unfinished work behind the second code.
 const hiddenProjects = [
   { name: "Project Cipher", url: "https://example.com", desc: "Encrypted journaling app. Half-built, looks promising." },
-  { name: "Atlas (WIP)",    url: "https://example.com", desc: "Interactive map of everywhere I've been. Data import is messy." },
+  { name: "Atlas",          url: "https://example.com", desc: "Interactive map of everywhere I've been. Data import is messy." },
 ];
 
 /* ============================================================
@@ -384,33 +384,34 @@ const TAG_META = {
   wip:  { cls: "wip",  label: "In Development" },
 };
 
-// --- tiny WebAudio sound engine (no asset files) ---
+// --- soft WebAudio chimes (no asset files) ---
 let actx;
-function tone(freq, dur, type = "square", gain = 0.04) {
+function tone(freq, dur, gain = 0.05, type = "sine") {
   try {
     actx = actx || new (window.AudioContext || window.webkitAudioContext)();
     const o = actx.createOscillator(), g = actx.createGain();
-    o.type = type; o.frequency.value = freq; g.gain.value = gain;
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(gain, actx.currentTime);
     o.connect(g); g.connect(actx.destination); o.start();
     g.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime + dur);
     o.stop(actx.currentTime + dur);
   } catch (e) {}
 }
-const beep  = () => tone(660, 0.08);
-const clunk = () => { tone(150, 0.18, "sawtooth", 0.06); setTimeout(() => tone(90, 0.3, "sawtooth", 0.06), 90); };
-const buzz  = () => tone(120, 0.3, "sawtooth", 0.05);
+const tap   = () => tone(740, 0.12, 0.035);
+const chime = () => { tone(660, 0.5, 0.05); setTimeout(() => tone(988, 0.7, 0.05), 110); };
+const low   = () => tone(180, 0.4, 0.05, "triangle");
 
 // --- reusable keypad controller ---
-function createKeypad(safeEl, code, onGranted) {
-  const readout = safeEl.querySelector(".readout");
-  const statusLine = safeEl.querySelector(".status-line");
-  const pad = safeEl.querySelector(".keypad");
+function createKeypad(rootEl, code, onGranted) {
+  const readout = rootEl.querySelector(".readout");
+  const statusLine = rootEl.querySelector(".status-line");
+  const pad = rootEl.querySelector(".keypad");
   const idle = statusLine.textContent;
   let entered = "", locked = false;
 
   function render() {
-    const slots = ["–","–","–","–"];
-    for (let i = 0; i < entered.length; i++) slots[i] = "•";
+    const slots = ["·","·","·","·"];
+    for (let i = 0; i < entered.length; i++) slots[i] = "●";
     readout.textContent = slots.join("");
   }
   function setStatus(msg, state) {
@@ -422,22 +423,22 @@ function createKeypad(safeEl, code, onGranted) {
   function evaluate() {
     if (entered === code) {
       locked = true;
-      setStatus("ACCESS GRANTED", "granted");
-      readout.textContent = "✓ ✓ ✓ ✓";
-      clunk();
+      setStatus("Access Granted", "granted");
+      readout.textContent = "● ● ● ●";
+      chime();
       setTimeout(onGranted, 850);
     } else {
-      setStatus("ACCESS DENIED", "denied"); buzz();
+      setStatus("Access Denied", "denied"); low();
       setTimeout(reset, 900);
     }
   }
   function press(k) {
     if (locked) return;
-    if (k === "clear") { entered = ""; render(); setStatus(idle); beep(); return; }
+    if (k === "clear") { entered = ""; render(); setStatus(idle); tap(); return; }
     if (k === "enter") { if (entered.length) evaluate(); return; }
     if (entered.length >= 4) return;
-    entered += k; beep(); render();
-    if (entered.length === 4) setTimeout(evaluate, 180);
+    entered += k; tap(); render();
+    if (entered.length === 4) setTimeout(evaluate, 200);
   }
   pad.addEventListener("click", (e) => {
     const key = e.target.closest(".key");
@@ -449,22 +450,10 @@ function createKeypad(safeEl, code, onGranted) {
 
 // --- wire up the two keypads ---
 let activeKeypad;
-
-const mainPad = createKeypad(
-  document.querySelector('[data-keypad="main"]'),
-  VAULT_CODE,
-  openVault
-);
-
-const innerPad = createKeypad(
-  document.querySelector('[data-keypad="inner"]'),
-  INNER_CODE,
-  openChamber
-);
-
+const mainPad  = createKeypad(document.querySelector('[data-keypad="main"]'),  VAULT_CODE, openVault);
+const innerPad = createKeypad(document.querySelector('[data-keypad="inner"]'), INNER_CODE, openChamber);
 activeKeypad = mainPad;
 
-// physical keyboard routes to whichever keypad is active
 window.addEventListener("keydown", (e) => {
   if (!activeKeypad) return;
   if (e.key >= "0" && e.key <= "9") activeKeypad.press(e.key);
@@ -472,28 +461,21 @@ window.addEventListener("keydown", (e) => {
   else if (e.key === "Backspace" || e.key === "Escape") activeKeypad.press("clear");
 });
 
-// --- main vault reveal ---
+// --- reveal the collection ---
 function openVault() {
   document.getElementById("lockScreen").classList.add("opening");
   const vault = document.getElementById("vault");
   vault.classList.add("revealed");
   document.querySelectorAll("#grid .item, #grid .door").forEach((el, i) => {
-    el.style.animationDelay = (i * 70) + "ms";
+    el.style.animationDelay = (i * 90) + "ms";
   });
-  activeKeypad = null; // no keypad active while browsing
-}
-
-// --- inner vault open/close ---
-const innerLock = document.getElementById("innerLock");
-function showInnerLock() {
-  innerPad.reset();
-  innerLock.classList.add("open");
-  activeKeypad = innerPad;
-}
-function hideInnerLock() {
-  innerLock.classList.remove("open");
   activeKeypad = null;
 }
+
+// --- private reserve open/close ---
+const innerLock = document.getElementById("innerLock");
+function showInnerLock() { innerPad.reset(); innerLock.classList.add("open"); activeKeypad = innerPad; }
+function hideInnerLock() { innerLock.classList.remove("open"); activeKeypad = null; }
 document.getElementById("innerClose").addEventListener("click", hideInnerLock);
 innerLock.addEventListener("click", (e) => { if (e.target === innerLock) hideInnerLock(); });
 
@@ -502,7 +484,7 @@ function openChamber() {
   const chamber = document.getElementById("chamber");
   chamber.classList.add("revealed");
   document.querySelectorAll("#chamberGrid .item").forEach((el, i) => {
-    el.style.animationDelay = (i * 70) + "ms";
+    el.style.animationDelay = (i * 90) + "ms";
   });
   chamber.scrollIntoView({ behavior: "smooth", block: "start" });
 }
@@ -511,31 +493,28 @@ function openChamber() {
 function cardHTML(p, no, tag) {
   const t = TAG_META[tag];
   const top = `<div class="item-top"><span class="item-no">${no}</span><span class="tag ${t.cls}">${t.label}</span></div>`;
-  return `<a class="item" href="${p.url}" target="_blank" rel="noopener">${top}<h3>${p.name}</h3><p>${p.desc}</p><div class="go">Open →</div></a>`;
+  return `<a class="item" href="${p.url}" target="_blank" rel="noopener">${top}<h3>${p.name}</h3><p>${p.desc}</p><div class="go">View →</div></a>`;
 }
 
 function build() {
-  // public grid + the door to the inner vault
-  let html = projects.map((p, i) => cardHTML(p, "VAULT NO. " + String(i + 1).padStart(3, "0"), p.tag)).join("");
+  let html = projects.map((p, i) => cardHTML(p, "No. " + String(i + 1).padStart(3, "0"), p.tag)).join("");
   if (hiddenProjects.length) {
     html += `<div class="door" id="vaultDoor">
-        <div class="lock-ico">🔒</div>
-        <h3>Restricted</h3>
-        <p>Inner vault · enter code</p>
+        <div class="key-ico">⚷</div>
+        <h3>The Private Reserve</h3>
+        <p>Restricted · enter code</p>
       </div>`;
   }
   document.getElementById("grid").innerHTML = html;
 
-  // inner grid
   document.getElementById("chamberGrid").innerHTML =
-    hiddenProjects.map((p, i) => cardHTML(p, "CLASSIFIED NO. " + String(i + 1).padStart(3, "0"), "wip")).join("");
+    hiddenProjects.map((p, i) => cardHTML(p, "Reserve No. " + String(i + 1).padStart(3, "0"), "wip")).join("");
 
-  // door opens the inner keypad
   const door = document.getElementById("vaultDoor");
   if (door) door.addEventListener("click", showInnerLock);
 
   document.getElementById("footer").innerHTML =
-    `${projects.length} items secured <span class="dot">•</span> vault established 2026 <span class="dot">•</span> jamesdomain.org`;
+    `${projects.length} works secured <span class="dot">·</span> established 2026 <span class="dot">·</span> jamesdomain.org`;
 }
 
 build();
