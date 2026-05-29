@@ -17,22 +17,39 @@ Everything you change day-to-day lives at the top of the `<script>` in
 `index.html`:
 
 ```js
-// The combination (theater, not real security)
-const VAULT_CODE = "0007";
+const VAULT_CODE = "0007";   // opens the main vault
+const INNER_CODE = "1342";   // opens the inner (work-in-progress) vault
 
-// Your links
+// Public collection. tag: "live" | "exp" | "arch"
 const projects = [
   { name: "Project Name", url: "https://...", desc: "One line.", tag: "live" },
-  // tag: "live" | "exp" | "arch" | "locked"
+];
+
+// Inner vault — unfinished work behind the second code
+const hiddenProjects = [
+  { name: "Half-built thing", url: "https://...", desc: "One line." },
 ];
 ```
 
-- `live`  — a shipped, working project (green)
-- `exp`   — an experiment / rough edges (amber)
-- `arch`  — kept for posterity (gray)
-- `locked`— "Classified", shown but not clickable (teaser for a future hidden chamber)
+- `live` — a shipped, working project (green)
+- `exp`  — an experiment / rough edges (amber)
+- `arch` — kept for posterity (gray)
+- inner-vault items are tagged "In Development" (crimson) automatically
 
-Before going public, remove the `DEMO CODE` hint line in the lock screen markup.
+Before going public, remove the two `DEMO CODE` hint lines in the markup.
+
+## The hidden chamber (inner vault)
+
+Inside the main vault there's a **Restricted** door. Clicking it opens a second
+keypad; entering `INNER_CODE` reveals the `hiddenProjects` — meant for projects
+you haven't finished yet.
+
+> ⚠️ **Important — this is theater, not real security.** Both codes and all
+> links live in the page source, so anyone who opens "view source" can read
+> them. It keeps casual visitors out, nothing more. If any hidden project is
+> genuinely sensitive, protect the deployment server-side instead — e.g.
+> Vercel's built-in password protection, or move the hidden list behind a
+> serverless function gated by an env-var password.
 
 ## Deploying to Vercel
 

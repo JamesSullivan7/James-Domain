@@ -17,6 +17,7 @@
     --brass:     #d4af37;
     --brass-dim: #9c8128;
     --amber:     #ffb000;
+    --crimson:   #c8503c;
     --text:      #e7e3d8;
     --muted:     #8a8779;
     --green:     #4caf6d;
@@ -28,7 +29,6 @@
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
   html, body { height: 100%; }
 
   body {
@@ -41,8 +41,6 @@
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
   }
-
-  /* faint metal-grid texture */
   body::before {
     content: "";
     position: fixed; inset: 0;
@@ -50,47 +48,12 @@
       linear-gradient(rgba(255,255,255,.015) 1px, transparent 1px),
       linear-gradient(90deg, rgba(255,255,255,.015) 1px, transparent 1px);
     background-size: 42px 42px;
-    pointer-events: none;
-    z-index: 0;
+    pointer-events: none; z-index: 0;
   }
 
   /* ============================================================
-     LOCK SCREEN
+     SAFE / KEYPAD (shared by main lock + inner chamber)
      ============================================================ */
-  #lockScreen {
-    position: fixed; inset: 0;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    gap: 26px;
-    z-index: 10;
-    padding: 24px;
-    transition: opacity .6s ease, transform .6s ease, filter .6s ease;
-  }
-  #lockScreen.opening { opacity: 0; transform: scale(1.08); filter: blur(6px); pointer-events: none; }
-
-  .brand-mark {
-    text-align: center;
-    letter-spacing: .5em;
-    text-transform: uppercase;
-    color: var(--muted);
-    font-size: 12px;
-    margin-bottom: 4px;
-  }
-  .brand-title {
-    text-align: center;
-    font-size: clamp(34px, 7vw, 60px);
-    font-weight: 800;
-    letter-spacing: .14em;
-    color: var(--text);
-    text-shadow: 0 2px 18px rgba(0,0,0,.6);
-  }
-  .brand-title .glint {
-    background: linear-gradient(90deg, var(--brass-dim), var(--brass) 45%, #fff6cf 50%, var(--brass) 55%, var(--brass-dim));
-    -webkit-background-clip: text; background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  /* The safe / keypad housing */
   .safe {
     width: 320px; max-width: 92vw;
     background: linear-gradient(160deg, var(--steel-2), var(--steel) 60%, #1c1e22);
@@ -102,30 +65,24 @@
       inset 0 1px 0 rgba(255,255,255,.08),
       inset 0 -2px 8px rgba(0,0,0,.5);
   }
+  .safe.inner { border-color: #6e3a32; }
 
-  /* the bolt indicators around the door */
   .bolts { display:flex; justify-content:space-between; margin-bottom:16px; }
   .bolt { width:9px; height:9px; border-radius:50%;
     background: radial-gradient(circle at 35% 30%, #6a6d76, #232529);
     box-shadow: inset 0 1px 1px rgba(255,255,255,.25); }
+  .safe.inner .bolt { background: radial-gradient(circle at 35% 30%, #a85a4c, #2a1714); }
 
   .readout {
-    font-family: var(--mono);
-    font-size: 30px;
-    letter-spacing: .35em;
-    text-align: center;
-    color: var(--amber);
-    background: #0c0d0f;
-    border: 1px solid #000;
-    border-radius: 8px;
-    padding: 14px 10px;
-    margin-bottom: 6px;
+    font-family: var(--mono); font-size: 30px; letter-spacing: .35em;
+    text-align: center; color: var(--amber);
+    background: #0c0d0f; border: 1px solid #000; border-radius: 8px;
+    padding: 14px 10px; margin-bottom: 6px;
     text-shadow: 0 0 12px rgba(255,176,0,.5);
     box-shadow: inset 0 2px 10px rgba(0,0,0,.8);
-    min-height: 58px;
-    user-select: none;
+    min-height: 58px; user-select: none;
   }
-  .readout.denied { color: var(--red); text-shadow: 0 0 12px rgba(224,83,61,.6); animation: shake .4s; }
+  .readout.denied  { color: var(--red);   text-shadow: 0 0 12px rgba(224,83,61,.6); animation: shake .4s; }
   .readout.granted { color: var(--green); text-shadow: 0 0 12px rgba(76,175,109,.6); }
 
   @keyframes shake {
@@ -138,47 +95,84 @@
     text-align:center; color: var(--muted); text-transform:uppercase;
     min-height: 16px; margin-bottom: 16px;
   }
-  .status-line.denied { color: var(--red); }
+  .status-line.denied  { color: var(--red); }
   .status-line.granted { color: var(--green); }
 
   .keypad { display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
   .key {
-    font-family: var(--mono);
-    font-size: 22px;
-    color: var(--text);
+    font-family: var(--mono); font-size: 22px; color: var(--text);
     background: linear-gradient(180deg, #43464e, #2b2d33);
-    border: 1px solid #54575f;
-    border-radius: 10px;
-    padding: 16px 0;
-    cursor: pointer;
-    user-select: none;
-    transition: transform .05s ease, background .15s ease, box-shadow .15s ease;
+    border: 1px solid #54575f; border-radius: 10px;
+    padding: 16px 0; cursor: pointer; user-select: none;
+    transition: transform .05s ease, background .15s ease;
     box-shadow: 0 2px 0 #1c1e22, inset 0 1px 0 rgba(255,255,255,.08);
   }
-  .key:hover { background: linear-gradient(180deg, #4d505a, #34373d); }
+  .key:hover  { background: linear-gradient(180deg, #4d505a, #34373d); }
   .key:active { transform: translateY(2px); box-shadow: 0 0 0 #1c1e22, inset 0 1px 3px rgba(0,0,0,.5); }
-  .key.fn { font-size: 16px; color: var(--brass); }
+  .key.fn    { font-size: 16px; color: var(--brass); }
   .key.enter { color: var(--green); }
 
   .hint {
     margin-top: 18px; text-align:center;
-    font-family: var(--mono); font-size: 11px; letter-spacing:.15em;
-    color: #5a5849;
+    font-family: var(--mono); font-size: 11px; letter-spacing:.15em; color: #5a5849;
   }
   .hint b { color: var(--amber); }
+
+  /* ============================================================
+     MAIN LOCK SCREEN
+     ============================================================ */
+  #lockScreen {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 26px; z-index: 10; padding: 24px;
+    transition: opacity .6s ease, transform .6s ease, filter .6s ease;
+  }
+  #lockScreen.opening { opacity: 0; transform: scale(1.08); filter: blur(6px); pointer-events: none; }
+
+  .brand-mark {
+    text-align: center; letter-spacing: .5em; text-transform: uppercase;
+    color: var(--muted); font-size: 12px; margin-bottom: 4px;
+  }
+  .brand-title {
+    text-align: center; font-size: clamp(34px, 7vw, 60px); font-weight: 800;
+    letter-spacing: .14em; color: var(--text); text-shadow: 0 2px 18px rgba(0,0,0,.6);
+  }
+  .brand-title .glint {
+    background: linear-gradient(90deg, var(--brass-dim), var(--brass) 45%, #fff6cf 50%, var(--brass) 55%, var(--brass-dim));
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+
+  /* ============================================================
+     INNER-VAULT OVERLAY
+     ============================================================ */
+  #innerLock {
+    position: fixed; inset: 0; z-index: 50;
+    display: none; align-items: center; justify-content: center;
+    padding: 24px;
+    background: rgba(5,5,6,.82); backdrop-filter: blur(6px);
+  }
+  #innerLock.open { display: flex; animation: fade .3s ease; }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  #innerLock .inner-wrap { display:flex; flex-direction:column; align-items:center; gap:18px; }
+  #innerLock .inner-kicker {
+    font-family: var(--mono); font-size: 11px; letter-spacing:.4em;
+    text-transform:uppercase; color: var(--crimson); text-align:center;
+  }
+  .close-x {
+    position: absolute; top: 22px; right: 26px;
+    font-family: var(--mono); font-size: 26px; color: var(--muted);
+    cursor: pointer; user-select:none; line-height:1;
+  }
+  .close-x:hover { color: var(--text); }
 
   /* ============================================================
      VAULT INTERIOR
      ============================================================ */
   #vault {
-    position: relative;
-    z-index: 1;
-    max-width: 1080px;
-    margin: 0 auto;
+    position: relative; z-index: 1; max-width: 1080px; margin: 0 auto;
     padding: 70px 24px 90px;
-    opacity: 0;
-    transform: translateY(20px);
-    pointer-events: none;
+    opacity: 0; transform: translateY(20px); pointer-events: none;
     transition: opacity .8s ease .2s, transform .8s ease .2s;
   }
   #vault.revealed { opacity: 1; transform: none; pointer-events: auto; }
@@ -188,46 +182,30 @@
     font-family: var(--mono); font-size: 11px; letter-spacing:.45em;
     text-transform:uppercase; color: var(--brass); margin-bottom: 14px;
   }
-  .vault-header h1 {
-    font-size: clamp(40px, 8vw, 76px);
-    font-weight: 800; letter-spacing:.1em;
-  }
-  .vault-header .sub {
-    margin-top: 14px; color: var(--muted); font-size: 14px; letter-spacing:.1em;
-  }
-  .rule {
-    width: 60px; height: 2px; margin: 26px auto 0;
-    background: linear-gradient(90deg, transparent, var(--brass), transparent);
-  }
+  .vault-header h1 { font-size: clamp(40px, 8vw, 76px); font-weight: 800; letter-spacing:.1em; }
+  .vault-header .sub { margin-top: 14px; color: var(--muted); font-size: 14px; letter-spacing:.1em; }
+  .rule { width: 60px; height: 2px; margin: 26px auto 0;
+    background: linear-gradient(90deg, transparent, var(--brass), transparent); }
 
   .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 18px;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px;
   }
 
   .item {
-    position: relative;
-    display: block;
-    text-decoration: none;
-    color: inherit;
+    position: relative; display: block; text-decoration: none; color: inherit;
     background: linear-gradient(165deg, var(--bg-2), #0c0c0e);
-    border: 1px solid #26272c;
-    border-radius: var(--radius);
-    padding: 22px 22px 20px;
-    overflow: hidden;
+    border: 1px solid #26272c; border-radius: var(--radius);
+    padding: 22px 22px 20px; overflow: hidden;
     transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
     opacity: 0; transform: translateY(14px);
   }
-  #vault.revealed .item { animation: rise .55s ease forwards; }
+  .revealed .item { animation: rise .55s ease forwards; }
   @keyframes rise { to { opacity:1; transform:none; } }
 
   .item:hover {
-    transform: translateY(-4px);
-    border-color: var(--brass-dim);
+    transform: translateY(-4px); border-color: var(--brass-dim);
     box-shadow: 0 18px 40px rgba(0,0,0,.55), 0 0 0 1px rgba(212,175,55,.15);
   }
-  /* glint sweep on hover */
   .item::after {
     content:""; position:absolute; top:0; left:-60%; width:40%; height:100%;
     background: linear-gradient(100deg, transparent, rgba(255,255,255,.07), transparent);
@@ -236,84 +214,119 @@
   .item:hover::after { left: 130%; }
 
   .item-top { display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; }
-  .item-no {
-    font-family: var(--mono); font-size: 11px; letter-spacing:.18em;
-    color: var(--brass); text-transform:uppercase;
-  }
+  .item-no { font-family: var(--mono); font-size: 11px; letter-spacing:.18em; color: var(--brass); text-transform:uppercase; }
   .tag {
-    font-family: var(--mono); font-size: 10px; letter-spacing:.14em;
-    text-transform:uppercase; padding: 4px 9px; border-radius: 999px;
-    border: 1px solid currentColor;
+    font-family: var(--mono); font-size: 10px; letter-spacing:.14em; text-transform:uppercase;
+    padding: 4px 9px; border-radius: 999px; border: 1px solid currentColor;
   }
-  .tag.live   { color: var(--green); }
-  .tag.exp    { color: var(--amber); }
-  .tag.arch   { color: var(--gray); }
-  .tag.locked { color: var(--red); }
+  .tag.live { color: var(--green); }
+  .tag.exp  { color: var(--amber); }
+  .tag.arch { color: var(--gray); }
+  .tag.wip  { color: var(--crimson); }
 
   .item h3 { font-size: 21px; font-weight: 700; letter-spacing:.02em; margin-bottom: 8px; }
   .item p  { color: var(--muted); font-size: 14px; line-height: 1.5; }
   .item .go {
-    margin-top: 16px; font-family: var(--mono); font-size: 11px;
-    letter-spacing:.18em; color: var(--muted); text-transform:uppercase;
-    display:flex; align-items:center; gap: 6px;
+    margin-top: 16px; font-family: var(--mono); font-size: 11px; letter-spacing:.18em;
+    color: var(--muted); text-transform:uppercase; display:flex; align-items:center; gap: 6px;
   }
   .item:hover .go { color: var(--brass); }
 
-  /* a restricted / classified item — teaser for a future hidden chamber */
-  .item.classified { cursor: not-allowed; }
-  .item.classified h3, .item.classified p { filter: blur(0.4px); opacity:.7; }
+  /* the door to the inner vault */
+  .door {
+    position: relative; display:flex; flex-direction:column; justify-content:center;
+    align-items:center; text-align:center; cursor: pointer;
+    background: repeating-linear-gradient(45deg, #141112, #141112 12px, #18110f 12px, #18110f 24px);
+    border: 1px dashed var(--crimson); border-radius: var(--radius);
+    padding: 22px; min-height: 150px;
+    transition: transform .18s ease, box-shadow .18s ease;
+    opacity:0; transform: translateY(14px);
+  }
+  .revealed .door { animation: rise .55s ease forwards; }
+  .door:hover { transform: translateY(-4px); box-shadow: 0 18px 40px rgba(0,0,0,.5), 0 0 0 1px rgba(200,80,60,.25); }
+  .door .lock-ico { font-size: 26px; margin-bottom: 10px; filter: drop-shadow(0 0 8px rgba(200,80,60,.5)); }
+  .door h3 { font-size: 16px; letter-spacing:.18em; text-transform:uppercase; color: var(--crimson); }
+  .door p { margin-top: 8px; font-family: var(--mono); font-size: 11px; letter-spacing:.15em; color: var(--muted); }
+
+  /* ============================================================
+     INNER CHAMBER (revealed after second code)
+     ============================================================ */
+  #chamber { margin-top: 70px; display: none; }
+  #chamber.revealed { display: block; }
+  .chamber-divider {
+    display:flex; align-items:center; gap:16px; margin-bottom: 40px;
+    color: var(--crimson);
+  }
+  .chamber-divider::before, .chamber-divider::after {
+    content:""; flex:1; height:1px;
+    background: linear-gradient(90deg, transparent, var(--crimson), transparent);
+  }
+  .chamber-divider span {
+    font-family: var(--mono); font-size: 12px; letter-spacing:.4em; text-transform:uppercase; white-space:nowrap;
+  }
+  #chamber .item { border-color: #3a201c; }
+  #chamber .item:hover { border-color: var(--crimson); box-shadow: 0 18px 40px rgba(0,0,0,.55), 0 0 0 1px rgba(200,80,60,.2); }
+  #chamber.revealed .item { animation: rise .55s ease forwards; }
 
   .vault-footer {
     margin-top: 60px; text-align:center;
-    font-family: var(--mono); font-size: 11px; letter-spacing:.2em;
-    color: #4f4d42; text-transform:uppercase;
+    font-family: var(--mono); font-size: 11px; letter-spacing:.2em; color: #4f4d42; text-transform:uppercase;
   }
   .vault-footer .dot { color: var(--brass); }
 </style>
 </head>
 <body>
 
-  <!-- =========================================================
-       LOCK SCREEN
-       ========================================================= -->
+  <!-- ===================== MAIN LOCK SCREEN ===================== -->
   <section id="lockScreen">
     <div>
       <div class="brand-mark">jamesdomain.org</div>
       <div class="brand-title">THE <span class="glint">VAULT</span></div>
     </div>
 
-    <div class="safe">
+    <div class="safe" data-keypad="main">
       <div class="bolts">
         <span class="bolt"></span><span class="bolt"></span><span class="bolt"></span>
         <span class="bolt"></span><span class="bolt"></span><span class="bolt"></span>
       </div>
-
-      <div class="readout" id="readout">––––</div>
-      <div class="status-line" id="statusLine">ENTER ACCESS CODE</div>
-
-      <div class="keypad" id="keypad">
-        <div class="key" data-k="1">1</div>
-        <div class="key" data-k="2">2</div>
-        <div class="key" data-k="3">3</div>
-        <div class="key" data-k="4">4</div>
-        <div class="key" data-k="5">5</div>
-        <div class="key" data-k="6">6</div>
-        <div class="key" data-k="7">7</div>
-        <div class="key" data-k="8">8</div>
-        <div class="key" data-k="9">9</div>
-        <div class="key fn" data-k="clear">CLR</div>
-        <div class="key" data-k="0">0</div>
-        <div class="key enter" data-k="enter">✓</div>
+      <div class="readout">––––</div>
+      <div class="status-line">ENTER ACCESS CODE</div>
+      <div class="keypad">
+        <div class="key" data-k="1">1</div><div class="key" data-k="2">2</div><div class="key" data-k="3">3</div>
+        <div class="key" data-k="4">4</div><div class="key" data-k="5">5</div><div class="key" data-k="6">6</div>
+        <div class="key" data-k="7">7</div><div class="key" data-k="8">8</div><div class="key" data-k="9">9</div>
+        <div class="key fn" data-k="clear">CLR</div><div class="key" data-k="0">0</div><div class="key enter" data-k="enter">✓</div>
       </div>
-
-      <!-- Remove this hint line before you go public -->
+      <!-- Remove this hint before going public -->
       <div class="hint">DEMO CODE — <b>0007</b></div>
     </div>
   </section>
 
-  <!-- =========================================================
-       VAULT INTERIOR
-       ========================================================= -->
+  <!-- ===================== INNER-VAULT OVERLAY ===================== -->
+  <div id="innerLock">
+    <span class="close-x" id="innerClose">✕</span>
+    <div class="inner-wrap">
+      <div class="inner-kicker">⚠ Inner Vault · Restricted</div>
+      <div class="safe inner" data-keypad="inner">
+        <div class="bolts">
+          <span class="bolt"></span><span class="bolt"></span><span class="bolt"></span>
+          <span class="bolt"></span><span class="bolt"></span><span class="bolt"></span>
+        </div>
+        <div class="readout">––––</div>
+        <div class="status-line">ENTER INNER CODE</div>
+        <div class="keypad">
+          <div class="key" data-k="1">1</div><div class="key" data-k="2">2</div><div class="key" data-k="3">3</div>
+          <div class="key" data-k="4">4</div><div class="key" data-k="5">5</div><div class="key" data-k="6">6</div>
+          <div class="key" data-k="7">7</div><div class="key" data-k="8">8</div><div class="key" data-k="9">9</div>
+          <div class="key fn" data-k="clear">CLR</div><div class="key" data-k="0">0</div><div class="key enter" data-k="enter">✓</div>
+        </div>
+        <!-- Remove this hint before going public -->
+        <div class="hint">DEMO INNER CODE — <b>1342</b></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== VAULT INTERIOR ===================== -->
   <main id="vault">
     <header class="vault-header">
       <div class="kicker">Access Granted</div>
@@ -324,37 +337,51 @@
 
     <div class="grid" id="grid"></div>
 
+    <section id="chamber">
+      <div class="chamber-divider"><span>The Inner Vault · In Development</span></div>
+      <div class="grid" id="chamberGrid"></div>
+    </section>
+
     <div class="vault-footer" id="footer"></div>
   </main>
 
 <script>
 /* ============================================================
-   CONFIG — this is the only part you edit day to day
+   CONFIG — the part you edit day to day
+   ------------------------------------------------------------
+   NOTE: these codes live in the page, so they are a fun gate,
+   NOT real security. Anyone viewing source can read them and
+   the hidden links. For genuinely private projects, protect the
+   deployment server-side (e.g. Vercel password protection).
    ============================================================ */
 
-// Change the combination here. (Theater, not real security.)
-const VAULT_CODE = "0007";
+const VAULT_CODE = "0007";   // opens the main vault
+const INNER_CODE = "1342";   // opens the inner (work-in-progress) vault
 
-// Your collection. Add / remove / reorder freely.
-// tag options: "live" | "exp" (experiment) | "arch" (archived) | "locked" (classified, non-clickable)
+// Public collection. tag: "live" | "exp" | "arch"
 const projects = [
-  { name: "Aurora Notes",   url: "https://example.com",  desc: "A calm, fast notes app with end-to-end sync.",           tag: "live" },
-  { name: "Pixel Forge",    url: "https://example.com",  desc: "Browser-based sprite & tilemap editor for game jams.",   tag: "live" },
-  { name: "Tideline",       url: "https://example.com",  desc: "Surf + tide forecasting dashboard, redesigned.",        tag: "live" },
-  { name: "Lab — Shaders",  url: "https://example.com",  desc: "A playground of WebGL experiments. Rough edges.",        tag: "exp"  },
-  { name: "Coin Diary",     url: "https://example.com",  desc: "An old budgeting tool. Kept for posterity.",            tag: "arch" },
-  { name: "Project Cipher", url: "#",                    desc: "Restricted. Access by invitation only.",                tag: "locked" },
+  { name: "Aurora Notes",  url: "https://example.com", desc: "A calm, fast notes app with end-to-end sync.",         tag: "live" },
+  { name: "Pixel Forge",   url: "https://example.com", desc: "Browser-based sprite & tilemap editor for game jams.", tag: "live" },
+  { name: "Tideline",      url: "https://example.com", desc: "Surf + tide forecasting dashboard, redesigned.",      tag: "live" },
+  { name: "Lab — Shaders", url: "https://example.com", desc: "A playground of WebGL experiments. Rough edges.",      tag: "exp"  },
+  { name: "Coin Diary",    url: "https://example.com", desc: "An old budgeting tool. Kept for posterity.",          tag: "arch" },
+];
+
+// Inner vault — unfinished work behind the second code. tag is forced to "wip".
+const hiddenProjects = [
+  { name: "Project Cipher", url: "https://example.com", desc: "Encrypted journaling app. Half-built, looks promising." },
+  { name: "Atlas (WIP)",    url: "https://example.com", desc: "Interactive map of everywhere I've been. Data import is messy." },
 ];
 
 /* ============================================================
-   Below here you usually don't need to touch
+   Below: usually no need to touch
    ============================================================ */
 
 const TAG_META = {
-  live:   { cls: "live",   label: "Live" },
-  exp:    { cls: "exp",    label: "Experiment" },
-  arch:   { cls: "arch",   label: "Archived" },
-  locked: { cls: "locked", label: "Classified" },
+  live: { cls: "live", label: "Live" },
+  exp:  { cls: "exp",  label: "Experiment" },
+  arch: { cls: "arch", label: "Archived" },
+  wip:  { cls: "wip",  label: "In Development" },
 };
 
 // --- tiny WebAudio sound engine (no asset files) ---
@@ -363,105 +390,155 @@ function tone(freq, dur, type = "square", gain = 0.04) {
   try {
     actx = actx || new (window.AudioContext || window.webkitAudioContext)();
     const o = actx.createOscillator(), g = actx.createGain();
-    o.type = type; o.frequency.value = freq;
-    g.gain.value = gain;
-    o.connect(g); g.connect(actx.destination);
-    o.start();
+    o.type = type; o.frequency.value = freq; g.gain.value = gain;
+    o.connect(g); g.connect(actx.destination); o.start();
     g.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime + dur);
     o.stop(actx.currentTime + dur);
-  } catch (e) { /* audio optional */ }
+  } catch (e) {}
 }
-const beep   = () => tone(660, 0.08);
-const clunk  = () => { tone(150, 0.18, "sawtooth", 0.06); setTimeout(() => tone(90, 0.3, "sawtooth", 0.06), 90); };
-const buzz   = () => tone(120, 0.3, "sawtooth", 0.05);
+const beep  = () => tone(660, 0.08);
+const clunk = () => { tone(150, 0.18, "sawtooth", 0.06); setTimeout(() => tone(90, 0.3, "sawtooth", 0.06), 90); };
+const buzz  = () => tone(120, 0.3, "sawtooth", 0.05);
 
-// --- keypad logic ---
-const readout    = document.getElementById("readout");
-const statusLine = document.getElementById("statusLine");
-let entered = "";
+// --- reusable keypad controller ---
+function createKeypad(safeEl, code, onGranted) {
+  const readout = safeEl.querySelector(".readout");
+  const statusLine = safeEl.querySelector(".status-line");
+  const pad = safeEl.querySelector(".keypad");
+  const idle = statusLine.textContent;
+  let entered = "", locked = false;
 
-function renderReadout() {
-  const slots = ["–","–","–","–"];
-  for (let i = 0; i < entered.length; i++) slots[i] = "•";
-  readout.textContent = slots.join("");
-}
-
-function setStatus(msg, state) {
-  statusLine.textContent = msg;
-  statusLine.className = "status-line" + (state ? " " + state : "");
-  readout.className = "readout" + (state ? " " + state : "");
-}
-
-function press(k) {
-  if (k === "clear") { entered = ""; renderReadout(); setStatus("ENTER ACCESS CODE"); beep(); return; }
-  if (k === "enter") { evaluate(); return; }
-  if (entered.length >= 4) return;
-  entered += k; beep(); renderReadout();
-  if (entered.length === 4) setTimeout(evaluate, 180);
-}
-
-function evaluate() {
-  if (entered === VAULT_CODE) {
-    setStatus("ACCESS GRANTED", "granted");
-    readout.textContent = "✓ ✓ ✓ ✓";
-    clunk();
-    setTimeout(openVault, 850);
-  } else {
-    setStatus("ACCESS DENIED", "denied");
-    buzz();
-    setTimeout(() => { entered = ""; renderReadout(); setStatus("ENTER ACCESS CODE"); }, 900);
+  function render() {
+    const slots = ["–","–","–","–"];
+    for (let i = 0; i < entered.length; i++) slots[i] = "•";
+    readout.textContent = slots.join("");
   }
+  function setStatus(msg, state) {
+    statusLine.textContent = msg;
+    statusLine.className = "status-line" + (state ? " " + state : "");
+    readout.className = "readout" + (state ? " " + state : "");
+  }
+  function reset() { entered = ""; locked = false; render(); setStatus(idle); }
+  function evaluate() {
+    if (entered === code) {
+      locked = true;
+      setStatus("ACCESS GRANTED", "granted");
+      readout.textContent = "✓ ✓ ✓ ✓";
+      clunk();
+      setTimeout(onGranted, 850);
+    } else {
+      setStatus("ACCESS DENIED", "denied"); buzz();
+      setTimeout(reset, 900);
+    }
+  }
+  function press(k) {
+    if (locked) return;
+    if (k === "clear") { entered = ""; render(); setStatus(idle); beep(); return; }
+    if (k === "enter") { if (entered.length) evaluate(); return; }
+    if (entered.length >= 4) return;
+    entered += k; beep(); render();
+    if (entered.length === 4) setTimeout(evaluate, 180);
+  }
+  pad.addEventListener("click", (e) => {
+    const key = e.target.closest(".key");
+    if (key) press(key.dataset.k);
+  });
+  render();
+  return { press, reset };
 }
 
-document.getElementById("keypad").addEventListener("click", (e) => {
-  const key = e.target.closest(".key");
-  if (key) press(key.dataset.k);
-});
+// --- wire up the two keypads ---
+let activeKeypad;
 
-// physical keyboard support
+const mainPad = createKeypad(
+  document.querySelector('[data-keypad="main"]'),
+  VAULT_CODE,
+  openVault
+);
+
+const innerPad = createKeypad(
+  document.querySelector('[data-keypad="inner"]'),
+  INNER_CODE,
+  openChamber
+);
+
+activeKeypad = mainPad;
+
+// physical keyboard routes to whichever keypad is active
 window.addEventListener("keydown", (e) => {
-  if (document.getElementById("lockScreen").classList.contains("opening")) return;
-  if (e.key >= "0" && e.key <= "9") press(e.key);
-  else if (e.key === "Enter") press("enter");
-  else if (e.key === "Backspace" || e.key === "Escape") press("clear");
+  if (!activeKeypad) return;
+  if (e.key >= "0" && e.key <= "9") activeKeypad.press(e.key);
+  else if (e.key === "Enter") activeKeypad.press("enter");
+  else if (e.key === "Backspace" || e.key === "Escape") activeKeypad.press("clear");
 });
 
-// --- reveal the vault ---
+// --- main vault reveal ---
 function openVault() {
   document.getElementById("lockScreen").classList.add("opening");
   const vault = document.getElementById("vault");
   vault.classList.add("revealed");
-  // stagger the item animations
-  document.querySelectorAll(".item").forEach((el, i) => {
+  document.querySelectorAll("#grid .item, #grid .door").forEach((el, i) => {
     el.style.animationDelay = (i * 70) + "ms";
   });
+  activeKeypad = null; // no keypad active while browsing
 }
 
-// --- build the collection ---
-function buildGrid() {
-  const grid = document.getElementById("grid");
-  grid.innerHTML = projects.map((p, i) => {
-    const t = TAG_META[p.tag] || TAG_META.live;
-    const no = "VAULT NO. " + String(i + 1).padStart(3, "0");
-    const locked = p.tag === "locked";
-    const tag = `<span class="tag ${t.cls}">${t.label}</span>`;
-    const top = `<div class="item-top"><span class="item-no">${no}</span>${tag}</div>`;
-    const body = `<h3>${p.name}</h3><p>${p.desc}</p>`;
-    const go = locked
-      ? `<div class="go">🔒 Restricted</div>`
-      : `<div class="go">Open →</div>`;
-    return locked
-      ? `<div class="item classified">${top}${body}${go}</div>`
-      : `<a class="item" href="${p.url}" target="_blank" rel="noopener">${top}${body}${go}</a>`;
-  }).join("");
+// --- inner vault open/close ---
+const innerLock = document.getElementById("innerLock");
+function showInnerLock() {
+  innerPad.reset();
+  innerLock.classList.add("open");
+  activeKeypad = innerPad;
+}
+function hideInnerLock() {
+  innerLock.classList.remove("open");
+  activeKeypad = null;
+}
+document.getElementById("innerClose").addEventListener("click", hideInnerLock);
+innerLock.addEventListener("click", (e) => { if (e.target === innerLock) hideInnerLock(); });
 
-  const count = projects.length;
+function openChamber() {
+  hideInnerLock();
+  const chamber = document.getElementById("chamber");
+  chamber.classList.add("revealed");
+  document.querySelectorAll("#chamberGrid .item").forEach((el, i) => {
+    el.style.animationDelay = (i * 70) + "ms";
+  });
+  chamber.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+// --- build cards ---
+function cardHTML(p, no, tag) {
+  const t = TAG_META[tag];
+  const top = `<div class="item-top"><span class="item-no">${no}</span><span class="tag ${t.cls}">${t.label}</span></div>`;
+  return `<a class="item" href="${p.url}" target="_blank" rel="noopener">${top}<h3>${p.name}</h3><p>${p.desc}</p><div class="go">Open →</div></a>`;
+}
+
+function build() {
+  // public grid + the door to the inner vault
+  let html = projects.map((p, i) => cardHTML(p, "VAULT NO. " + String(i + 1).padStart(3, "0"), p.tag)).join("");
+  if (hiddenProjects.length) {
+    html += `<div class="door" id="vaultDoor">
+        <div class="lock-ico">🔒</div>
+        <h3>Restricted</h3>
+        <p>Inner vault · enter code</p>
+      </div>`;
+  }
+  document.getElementById("grid").innerHTML = html;
+
+  // inner grid
+  document.getElementById("chamberGrid").innerHTML =
+    hiddenProjects.map((p, i) => cardHTML(p, "CLASSIFIED NO. " + String(i + 1).padStart(3, "0"), "wip")).join("");
+
+  // door opens the inner keypad
+  const door = document.getElementById("vaultDoor");
+  if (door) door.addEventListener("click", showInnerLock);
+
   document.getElementById("footer").innerHTML =
-    `${count} items secured <span class="dot">•</span> vault established 2026 <span class="dot">•</span> jamesdomain.org`;
+    `${projects.length} items secured <span class="dot">•</span> vault established 2026 <span class="dot">•</span> jamesdomain.org`;
 }
 
-renderReadout();
-buildGrid();
+build();
 </script>
 </body>
 </html>
