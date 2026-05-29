@@ -269,8 +269,22 @@
   #chamber .item-no { color: var(--oxblood); }
   #chamber.revealed .item { animation: rise .7s ease forwards; }
 
+  /* enquiry / contact */
+  .enquire { text-align:center; margin-top: 96px; }
+  .enquire .lead {
+    font-family: var(--serif); font-style: italic; font-size: 25px; color: var(--cream);
+    margin-bottom: 24px;
+  }
+  .enquire-btn {
+    display:inline-block; text-decoration:none;
+    font-size: 12px; letter-spacing:.42em; text-transform:uppercase; color: var(--gold-lt);
+    border: 1px solid var(--gold); padding: 17px 46px; border-radius: var(--radius);
+    transition: background .35s ease, color .35s ease;
+  }
+  .enquire-btn:hover { background: var(--gold); color: var(--bg); }
+
   .gallery-footer {
-    margin-top: 80px; text-align:center; font-size: 11px; letter-spacing:.32em;
+    margin-top: 70px; text-align:center; font-size: 11px; letter-spacing:.32em;
     text-transform:uppercase; color: var(--faint);
   }
   .gallery-footer .dot { color: var(--gold); margin: 0 8px; }
@@ -342,6 +356,11 @@
       </div>
       <div class="grid" id="chamberGrid"></div>
     </section>
+
+    <div class="enquire">
+      <div class="lead">Interested in a commission, or simply to say hello?</div>
+      <a class="enquire-btn" href="mailto:james@oniven.com?subject=Regarding%20The%20Vault&body=Hello%20James%2C%0A%0A">Contact the Curator</a>
+    </div>
 
     <div class="gallery-footer" id="footer"></div>
   </main>
