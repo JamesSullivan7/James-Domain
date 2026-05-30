@@ -36,7 +36,8 @@ const hiddenProjects = [
 - `arch` — kept for posterity (gray)
 - inner-vault items are tagged "In Development" (crimson) automatically
 
-Before going public, remove the two `DEMO CODE` hint lines in the markup.
+The on-screen demo-code hints have been removed. To show a hint again during
+testing, add a `<div class="hint">…</div>` inside a console.
 
 ## The hidden chamber (inner vault)
 
