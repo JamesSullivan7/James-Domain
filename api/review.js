@@ -117,15 +117,18 @@ function safeName(name) {
 }
 async function storeFile(buffer, name, contentType) {
   if (!supabase) return "";
-  // make sure the public bucket exists
+  // make sure a PRIVATE bucket exists (files are served via signed links, not public URLs)
   const { data: buckets } = await supabase.storage.listBuckets();
   if (!buckets || !buckets.find(b => b.name === BUCKET)) {
-    await supabase.storage.createBucket(BUCKET, { public: true });
+    await supabase.storage.createBucket(BUCKET, { public: false });
+  } else {
+    await supabase.storage.updateBucket(BUCKET, { public: false }); // enforce private if it already existed
   }
   const path = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}-${safeName(name)}`;
   const { error } = await supabase.storage.from(BUCKET).upload(path, buffer, { contentType, upsert: false });
   if (error) throw new Error("Couldn't store the file: " + error.message);
-  return supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+  // the card links to our own endpoint, which mints a fresh short-lived signed URL on each open
+  return "/api/file?path=" + encodeURIComponent(path);
 }
 
 export default async function handler(req, res) {

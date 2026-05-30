@@ -13,7 +13,8 @@ saving in your own browser so it still works.)
 ```
 index.html        the whole front-end (keypad, catalog, search, add-a-work form)
 api/works.js      Vercel serverless function: GET / POST / DELETE works
-api/review.js     Vercel serverless function: AI auto-fill from a link (Claude)
+api/review.js     Vercel serverless function: AI auto-fill from a link or file (Claude)
+api/file.js       Vercel serverless function: signed-link redirect for private files
 package.json      declares @supabase/supabase-js and @anthropic-ai/sdk
 supabase/schema.sql   the table to create in Supabase (run once)
 ```
@@ -74,9 +75,11 @@ and a **Choose file** button.
   (or the page's title/description), sends them to **Claude Haiku 4.5**, and
   drafts the entry.
 - **From a file:** choose a **PDF, image, or text/Markdown** file (up to ~3 MB).
-  The file is stored in a Supabase Storage bucket (`vault-uploads`, created
-  automatically and **public-by-URL**), Claude reads it, and the card is filed
-  as a **Document** linking to the stored file.
+  The file is stored in a **private** Supabase Storage bucket (`vault-uploads`,
+  created automatically), Claude reads it, and the card is filed as a
+  **Document**. The card links to `/api/file?path=…`, which mints a fresh
+  **signed URL that expires after 1 hour** on each open — there is no permanent
+  public URL to the file.
 
 Either way the form fills in name, type, summary, category (reusing your existing
 categories when they fit), and tech tags for you to review before saving. It's
