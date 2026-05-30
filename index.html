@@ -167,14 +167,14 @@
      THE COLLECTION (vault interior)
      ============================================================ */
   #vault {
-    position: relative; z-index: 1; max-width: 1100px; margin: 0 auto;
+    position: relative; z-index: 1; max-width: 1140px; margin: 0 auto;
     padding: 90px 28px 100px;
     opacity: 0; transform: translateY(18px); pointer-events: none;
     transition: opacity .9s ease .2s, transform .9s ease .2s;
   }
   #vault.revealed { opacity: 1; transform: none; pointer-events: auto; }
 
-  .gallery-header { text-align:center; margin-bottom: 70px; }
+  .gallery-header { text-align:center; margin-bottom: 48px; }
   .gallery-header .kicker { color: var(--gold); margin-bottom: 18px; }
   .gallery-header h1 {
     font-family: var(--serif); font-weight: 500; font-size: clamp(52px, 9vw, 88px);
@@ -186,25 +186,71 @@
   }
   .gallery-header .rule { margin: 30px auto 0; }
 
+  /* ---- search + filters (the catalog controls) ---- */
+  .controls { max-width: 760px; margin: 0 auto 56px; }
+  .search-wrap { position: relative; margin-bottom: 22px; }
+  .search-wrap .icon {
+    position:absolute; left: 18px; top: 50%; transform: translateY(-50%);
+    color: var(--faint); font-size: 15px; pointer-events:none;
+  }
+  #search {
+    width: 100%; background: rgba(20,16,12,.5); color: var(--cream);
+    border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 15px 46px 15px 46px; font-family: var(--sans); font-weight: 300;
+    font-size: 15px; letter-spacing: .04em; outline: none;
+    transition: border-color .25s ease, background .25s ease;
+  }
+  #search::placeholder { color: var(--faint); letter-spacing:.12em; text-transform:uppercase; font-size: 12px; }
+  #search:focus { border-color: var(--gold); background: rgba(201,162,39,.04); }
+  .search-clear {
+    position:absolute; right: 16px; top: 50%; transform: translateY(-50%);
+    color: var(--faint); cursor:pointer; font-size: 18px; display:none; line-height:1;
+  }
+  .search-clear:hover { color: var(--gold-lt); }
+  .search-clear.show { display:block; }
+
+  .chips { display:flex; flex-wrap:wrap; gap: 10px; justify-content:center; }
+  .chip {
+    font-family: var(--sans); font-weight: 400; font-size: 11px;
+    letter-spacing:.22em; text-transform:uppercase; color: var(--muted);
+    background: transparent; border: 1px solid var(--line); border-radius: 999px;
+    padding: 8px 18px; cursor: pointer;
+    transition: border-color .25s ease, color .25s ease, background .25s ease;
+  }
+  .chip:hover { border-color: var(--gold); color: var(--gold-lt); }
+  .chip.active { border-color: var(--gold); color: var(--bg); background: var(--gold); }
+  .chip .count { opacity: .6; margin-left: 7px; font-size: 10px; }
+
+  /* ---- category sections ---- */
+  .section { margin-bottom: 60px; }
+  .section-head {
+    display:flex; align-items:center; gap: 18px; margin-bottom: 26px;
+  }
+  .section-head h2 {
+    font-family: var(--serif); font-style: italic; font-weight: 500;
+    font-size: 30px; color: var(--gold-lt); white-space: nowrap;
+  }
+  .section-head .line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
+  .section-head .n { font-size: 11px; letter-spacing:.24em; color: var(--faint); text-transform:uppercase; }
+
   .grid {
-    display:grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 22px;
+    display:grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 22px;
   }
 
   .item {
-    position: relative; display:block; text-decoration:none; color: inherit;
+    position: relative; display:flex; flex-direction:column; text-decoration:none; color: inherit;
     background: linear-gradient(165deg, var(--panel), #0e0b09);
     border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 30px 30px 26px; overflow: hidden;
+    padding: 26px 28px 24px; overflow: hidden;
     transition: transform .3s ease, border-color .3s ease, box-shadow .3s ease;
     opacity: 0; transform: translateY(14px);
   }
-  .revealed .item { animation: rise .7s ease forwards; }
+  .revealed .item { animation: rise .6s ease forwards; }
   @keyframes rise { to { opacity:1; transform:none; } }
   .item:hover {
     transform: translateY(-5px); border-color: var(--gold);
     box-shadow: 0 24px 50px rgba(0,0,0,.5), 0 0 0 1px rgba(201,162,39,.12);
   }
-  /* gold corner tick on hover */
   .item::before {
     content:""; position:absolute; top:14px; right:14px; width:10px; height:10px;
     border-top:1px solid var(--gold); border-right:1px solid var(--gold);
@@ -212,36 +258,51 @@
   }
   .item:hover::before { opacity:1; }
 
-  .item-top { display:flex; justify-content:space-between; align-items:baseline; margin-bottom: 18px; }
-  .item-no { font-size: 11px; letter-spacing:.3em; color: var(--gold); text-transform:uppercase; }
-  .tag {
-    font-size: 10px; letter-spacing:.24em; text-transform:uppercase; color: var(--muted);
+  .item-top { display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; gap: 12px; }
+  /* type badge (Site vs Repository) */
+  .type-badge {
+    display:inline-flex; align-items:center; gap: 6px;
+    font-size: 10px; letter-spacing:.22em; text-transform:uppercase; color: var(--muted);
+    border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px;
   }
+  .type-badge.repo { color: var(--gold-lt); border-color: rgba(201,162,39,.35); }
+  .type-badge .gi { font-size: 11px; }
+
+  .tag { font-size: 10px; letter-spacing:.24em; text-transform:uppercase; color: var(--muted); white-space:nowrap; }
   .tag::before { content:"— "; }
   .tag.live { color: var(--sage); }
   .tag.exp  { color: var(--gold); }
   .tag.arch { color: var(--stone); }
   .tag.wip  { color: var(--oxblood); }
 
-  .item h3 { font-family: var(--serif); font-weight: 500; font-size: 27px; letter-spacing:.01em; margin-bottom: 10px; }
-  .item p  { font-size: 14px; line-height: 1.6; color: var(--muted); }
+  .item h3 { font-family: var(--serif); font-weight: 500; font-size: 25px; letter-spacing:.01em; margin-bottom: 9px; }
+  .item p  { font-size: 14px; line-height: 1.6; color: var(--muted); flex: 1; }
+
+  .tech { display:flex; flex-wrap:wrap; gap: 7px; margin-top: 16px; }
+  .tech .t {
+    font-size: 10px; letter-spacing:.1em; text-transform:uppercase; color: var(--faint);
+    border: 1px solid var(--line); border-radius: 3px; padding: 3px 8px;
+  }
   .item .go {
-    margin-top: 20px; font-size: 11px; letter-spacing:.3em; text-transform:uppercase;
+    margin-top: 18px; font-size: 11px; letter-spacing:.3em; text-transform:uppercase;
     color: var(--faint); transition: color .3s ease;
   }
   .item:hover .go { color: var(--gold-lt); }
 
-  /* the door to the private reserve */
+  .no-results {
+    text-align:center; padding: 60px 20px; color: var(--muted);
+    font-family: var(--serif); font-style: italic; font-size: 22px;
+  }
+
+  /* the door to the private reserve (own row, full width feel) */
   .door {
     position:relative; display:flex; flex-direction:column; justify-content:center; align-items:center;
-    text-align:center; cursor:pointer; min-height: 170px; padding: 30px;
-    border: 1px solid #4a2e28; border-radius: var(--radius);
+    text-align:center; cursor:pointer; min-height: 150px; padding: 30px; margin-top: 12px;
+    border: 1px dashed #4a2e28; border-radius: var(--radius);
     background: linear-gradient(165deg, #190f0c, #0e0907);
     transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
-    opacity:0; transform: translateY(14px);
   }
-  .revealed .door { animation: rise .7s ease forwards; }
-  .door:hover { transform: translateY(-5px); border-color: var(--oxblood);
+  .door:hover { border-color: var(--oxblood);
     box-shadow: 0 24px 50px rgba(0,0,0,.5), 0 0 0 1px rgba(154,90,74,.18); }
   .door .key-ico { font-family: var(--serif); font-size: 30px; color: var(--oxblood); margin-bottom: 12px; }
   .door h3 { font-family: var(--serif); font-style: italic; font-size: 22px; color: #c98a78; }
@@ -250,30 +311,23 @@
   /* ============================================================
      PRIVATE RESERVE (hidden chamber)
      ============================================================ */
-  #chamber { margin-top: 86px; display:none; }
+  #chamber { margin-top: 80px; display:none; }
   #chamber.revealed { display:block; }
-  .reserve-divider { text-align:center; margin-bottom: 56px; }
-  .reserve-divider .label {
-    font-family: var(--serif); font-style: italic; font-size: 30px; color: #c98a78;
-  }
-  .reserve-divider .meta {
-    margin-top: 8px; font-size: 11px; letter-spacing:.34em; text-transform:uppercase; color: var(--muted);
-  }
-  .reserve-divider .r {
-    width: 56px; height: 1px; margin: 22px auto 0;
-    background: linear-gradient(90deg, transparent, var(--oxblood), transparent);
-  }
+  .reserve-divider { text-align:center; margin-bottom: 48px; }
+  .reserve-divider .label { font-family: var(--serif); font-style: italic; font-size: 30px; color: #c98a78; }
+  .reserve-divider .meta { margin-top: 8px; font-size: 11px; letter-spacing:.34em; text-transform:uppercase; color: var(--muted); }
+  .reserve-divider .r { width: 56px; height: 1px; margin: 22px auto 0;
+    background: linear-gradient(90deg, transparent, var(--oxblood), transparent); }
   #chamber .item { border-color: #36211c; }
   #chamber .item:hover { border-color: var(--oxblood); box-shadow: 0 24px 50px rgba(0,0,0,.5), 0 0 0 1px rgba(154,90,74,.15); }
   #chamber .item::before { border-color: var(--oxblood); }
-  #chamber .item-no { color: var(--oxblood); }
-  #chamber.revealed .item { animation: rise .7s ease forwards; }
+  #chamber .type-badge.repo { color: #d08a78; border-color: rgba(154,90,74,.4); }
+  #chamber.revealed .item { animation: rise .6s ease forwards; }
 
   /* enquiry / contact */
   .enquire { text-align:center; margin-top: 96px; }
   .enquire .lead {
-    font-family: var(--serif); font-style: italic; font-size: 25px; color: var(--cream);
-    margin-bottom: 24px;
+    font-family: var(--serif); font-style: italic; font-size: 25px; color: var(--cream); margin-bottom: 24px;
   }
   .enquire-btn {
     display:inline-block; text-decoration:none;
@@ -342,15 +396,34 @@
       <div class="rule"></div>
     </header>
 
-    <div class="grid" id="grid"></div>
+    <!-- search + category filters -->
+    <div class="controls">
+      <div class="search-wrap">
+        <span class="icon">⌕</span>
+        <input id="search" type="text" placeholder="Search by name, summary, tech…" autocomplete="off" />
+        <span class="search-clear" id="searchClear">✕</span>
+      </div>
+      <div class="chips" id="chips"></div>
+    </div>
 
+    <!-- category sections render here -->
+    <div id="catalog"></div>
+
+    <!-- door to the private reserve -->
+    <div class="door" id="vaultDoor" style="display:none">
+      <div class="key-ico">⚷</div>
+      <h3>The Private Reserve</h3>
+      <p>Restricted · enter code</p>
+    </div>
+
+    <!-- the private reserve, revealed after the second code -->
     <section id="chamber">
       <div class="reserve-divider">
         <div class="label">The Private Reserve</div>
         <div class="meta">In development · not yet unveiled</div>
         <div class="r"></div>
       </div>
-      <div class="grid" id="chamberGrid"></div>
+      <div id="chamberCatalog"></div>
     </section>
 
     <div class="enquire">
@@ -365,38 +438,95 @@
 /* ============================================================
    CONFIG — the part you edit day to day
    ------------------------------------------------------------
-   NOTE: these codes live in the page, so they are a fun gate,
-   NOT real security. For genuinely private projects, protect
-   the deployment server-side (e.g. Vercel password protection).
+   NOTE: the access codes live in the page, so they are a fun
+   gate, NOT real security. For genuinely private projects,
+   protect the deployment server-side (e.g. Vercel password
+   protection).
    ============================================================ */
 
 const VAULT_CODE = "6426";   // opens the collection
 const INNER_CODE = "4815";   // opens the private reserve
 
-// Public collection. tag: "live" | "exp" | "arch"
-const projects = [
-  { name: "Aurora Notes",  url: "https://example.com", desc: "A calm, fast notes app with end-to-end sync.",         tag: "live" },
-  { name: "Pixel Forge",   url: "https://example.com", desc: "Browser-based sprite & tilemap editor for game jams.", tag: "live" },
-  { name: "Tideline",      url: "https://example.com", desc: "Surf & tide forecasting dashboard, redesigned.",      tag: "live" },
-  { name: "Lab — Shaders", url: "https://example.com", desc: "A playground of WebGL experiments. Rough edges.",      tag: "exp"  },
-  { name: "Coin Diary",    url: "https://example.com", desc: "An old budgeting tool. Kept for posterity.",          tag: "arch" },
+/* ------------------------------------------------------------
+   EACH WORK IN THE VAULT
+   ------------------------------------------------------------
+   Add an entry per project. Fields:
+
+     name      – the title shown on the card
+     type      – "site"  (a live website / web app)
+               | "repo"  (a git repository)
+     url       – where the card links to (the live URL or the repo URL)
+     summary   – a sentence or two: what it is, why it exists
+     category  – the heading it's grouped under. Reuse the same
+                 spelling to group works together. Make up any
+                 categories you like.
+     tech      – array of tech tags, e.g. ["React","TypeScript"]
+                 (these also show on the card and are searchable)
+     status    – "live" | "experiment" | "archived" | "wip"
+
+   To add a project: copy a line, change the values. That's it.
+   The page builds the categories, search, and filters automatically.
+   ------------------------------------------------------------ */
+const works = [
+  // ---- Web Apps ----
+  { name: "Aurora Notes", type: "site", url: "https://example.com",
+    summary: "A calm, fast notes app with end-to-end sync.",
+    category: "Web Apps", tech: ["React", "TypeScript", "Supabase"], status: "live" },
+
+  { name: "Tideline", type: "site", url: "https://example.com",
+    summary: "Surf & tide forecasting dashboard, redesigned for clarity.",
+    category: "Web Apps", tech: ["Next.js", "D3"], status: "live" },
+
+  // ---- Tools & CLIs ----
+  { name: "repo-snapshot", type: "repo", url: "https://github.com/example/repo-snapshot",
+    summary: "CLI that captures a one-page Markdown summary of any git repo.",
+    category: "Tools & CLIs", tech: ["Node", "TypeScript"], status: "live" },
+
+  { name: "dotfiles", type: "repo", url: "https://github.com/example/dotfiles",
+    summary: "My shell, editor and terminal configuration. Reproducible setup.",
+    category: "Tools & CLIs", tech: ["Shell", "Lua"], status: "live" },
+
+  // ---- Libraries ----
+  { name: "tiny-state", type: "repo", url: "https://github.com/example/tiny-state",
+    summary: "A 1kb state container for the browser. No dependencies.",
+    category: "Libraries", tech: ["TypeScript"], status: "live" },
+
+  // ---- Experiments ----
+  { name: "Lab — Shaders", type: "site", url: "https://example.com",
+    summary: "A playground of WebGL shader experiments. Rough edges, fun visuals.",
+    category: "Experiments", tech: ["WebGL", "GLSL"], status: "experiment" },
+
+  { name: "markov-poet", type: "repo", url: "https://github.com/example/markov-poet",
+    summary: "Generates oddly beautiful poetry from a corpus. A weekend toy.",
+    category: "Experiments", tech: ["Python"], status: "experiment" },
+
+  // ---- Archive ----
+  { name: "Coin Diary", type: "site", url: "https://example.com",
+    summary: "An old budgeting tool. Kept for posterity.",
+    category: "Archive", tech: ["Vue"], status: "archived" },
 ];
 
-// Private reserve — unfinished work behind the second code.
-const hiddenProjects = [
-  { name: "Project Cipher", url: "https://example.com", desc: "Encrypted journaling app. Half-built, looks promising." },
-  { name: "Atlas",          url: "https://example.com", desc: "Interactive map of everywhere I've been. Data import is messy." },
+/* Works hidden behind the second code (in-development).
+   Same fields as above. */
+const hiddenWorks = [
+  { name: "Project Cipher", type: "repo", url: "https://github.com/example/cipher",
+    summary: "Encrypted journaling app. Half-built, but looks promising.",
+    category: "In Development", tech: ["Rust", "Tauri"], status: "wip" },
+
+  { name: "Atlas", type: "site", url: "https://example.com",
+    summary: "Interactive map of everywhere I've been. Data import is still messy.",
+    category: "In Development", tech: ["MapLibre", "SvelteKit"], status: "wip" },
 ];
 
 /* ============================================================
    Below: usually no need to touch
    ============================================================ */
 
-const TAG_META = {
-  live: { cls: "live", label: "Live" },
-  exp:  { cls: "exp",  label: "Experiment" },
-  arch: { cls: "arch", label: "Archived" },
-  wip:  { cls: "wip",  label: "In Development" },
+const STATUS_META = {
+  live:       { cls: "live", label: "Live" },
+  experiment: { cls: "exp",  label: "Experiment" },
+  archived:   { cls: "arch", label: "Archived" },
+  wip:        { cls: "wip",  label: "In Development" },
 };
 
 // --- soft WebAudio chimes (no asset files) ---
@@ -470,7 +600,9 @@ const innerPad = createKeypad(document.querySelector('[data-keypad="inner"]'), I
 activeKeypad = mainPad;
 
 window.addEventListener("keydown", (e) => {
+  // when browsing the catalog, let typing go to the search box, not a keypad
   if (!activeKeypad) return;
+  if (document.activeElement && document.activeElement.id === "search") return;
   if (e.key >= "0" && e.key <= "9") activeKeypad.press(e.key);
   else if (e.key === "Enter") activeKeypad.press("enter");
   else if (e.key === "Backspace" || e.key === "Escape") activeKeypad.press("clear");
@@ -479,12 +611,10 @@ window.addEventListener("keydown", (e) => {
 // --- reveal the collection ---
 function openVault() {
   document.getElementById("lockScreen").classList.add("opening");
-  const vault = document.getElementById("vault");
-  vault.classList.add("revealed");
-  document.querySelectorAll("#grid .item, #grid .door").forEach((el, i) => {
-    el.style.animationDelay = (i * 90) + "ms";
-  });
+  document.getElementById("vault").classList.add("revealed");
   activeKeypad = null;
+  renderCatalog();   // build with animations on first reveal
+  setTimeout(() => document.getElementById("search").focus(), 900);
 }
 
 // --- private reserve open/close ---
@@ -498,41 +628,148 @@ function openChamber() {
   hideInnerLock();
   const chamber = document.getElementById("chamber");
   chamber.classList.add("revealed");
-  document.querySelectorAll("#chamberGrid .item").forEach((el, i) => {
-    el.style.animationDelay = (i * 90) + "ms";
-  });
+  document.getElementById("vaultDoor").style.display = "none";
+  renderChamber();
   chamber.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-// --- build cards ---
-function cardHTML(p, no, tag) {
-  const t = TAG_META[tag];
-  const top = `<div class="item-top"><span class="item-no">${no}</span><span class="tag ${t.cls}">${t.label}</span></div>`;
-  return `<a class="item" href="${p.url}" target="_blank" rel="noopener">${top}<h3>${p.name}</h3><p>${p.desc}</p><div class="go">View →</div></a>`;
+/* ============================================================
+   CATALOG: cards, categories, search, filters
+   ============================================================ */
+
+const GITHUB_ICON = "⌥"; // simple glyph; shown on repo badges
+
+function cardHTML(w) {
+  const s = STATUS_META[w.status] || STATUS_META.live;
+  const isRepo = w.type === "repo";
+  const badge = isRepo
+    ? `<span class="type-badge repo"><span class="gi">❮❯</span> Repository</span>`
+    : `<span class="type-badge"><span class="gi">◍</span> Live Site</span>`;
+  const tech = (w.tech && w.tech.length)
+    ? `<div class="tech">${w.tech.map(t => `<span class="t">${t}</span>`).join("")}</div>`
+    : "";
+  const cta = isRepo ? "View Repository →" : "Visit Site →";
+  return `<a class="item" href="${w.url}" target="_blank" rel="noopener">
+      <div class="item-top">${badge}<span class="tag ${s.cls}">${s.label}</span></div>
+      <h3>${w.name}</h3>
+      <p>${w.summary}</p>
+      ${tech}
+      <div class="go">${cta}</div>
+    </a>`;
 }
 
-function build() {
-  let html = projects.map((p, i) => cardHTML(p, "No. " + String(i + 1).padStart(3, "0"), p.tag)).join("");
-  if (hiddenProjects.length) {
-    html += `<div class="door" id="vaultDoor">
-        <div class="key-ico">⚷</div>
-        <h3>The Private Reserve</h3>
-        <p>Restricted · enter code</p>
-      </div>`;
+// group an array of works into { category: [works] }, preserving first-seen order
+function groupByCategory(list) {
+  const groups = {};
+  for (const w of list) {
+    const cat = w.category || "Uncategorised";
+    (groups[cat] = groups[cat] || []).push(w);
   }
-  document.getElementById("grid").innerHTML = html;
+  return groups;
+}
 
-  document.getElementById("chamberGrid").innerHTML =
-    hiddenProjects.map((p, i) => cardHTML(p, "Reserve No. " + String(i + 1).padStart(3, "0"), "wip")).join("");
+function sectionHTML(category, list) {
+  const cards = list.map(cardHTML).join("");
+  return `<section class="section">
+      <div class="section-head">
+        <h2>${category}</h2>
+        <span class="line"></span>
+        <span class="n">${list.length} ${list.length === 1 ? "work" : "works"}</span>
+      </div>
+      <div class="grid">${cards}</div>
+    </section>`;
+}
 
+// ---- filter state ----
+let activeCategory = "All";
+let query = "";
+
+function matches(w) {
+  if (activeCategory !== "All" && w.category !== activeCategory) return false;
+  if (!query) return true;
+  const hay = [w.name, w.summary, w.category, w.type, ...(w.tech || [])]
+    .join(" ").toLowerCase();
+  return query.toLowerCase().split(/\s+/).every(term => hay.includes(term));
+}
+
+function renderChips() {
+  const cats = ["All", ...Array.from(new Set(works.map(w => w.category)))];
+  const chips = cats.map(cat => {
+    const count = cat === "All" ? works.length : works.filter(w => w.category === cat).length;
+    const active = cat === activeCategory ? " active" : "";
+    return `<button class="chip${active}" data-cat="${cat}">${cat}<span class="count">${count}</span></button>`;
+  }).join("");
+  document.getElementById("chips").innerHTML = chips;
+}
+
+function renderCatalog(animate = true) {
+  const filtered = works.filter(matches);
+  const host = document.getElementById("catalog");
+
+  if (!filtered.length) {
+    host.innerHTML = `<div class="no-results">No works match your search.</div>`;
+  } else {
+    const groups = groupByCategory(filtered);
+    host.innerHTML = Object.keys(groups).map(cat => sectionHTML(cat, groups[cat])).join("");
+  }
+
+  // stagger card reveal
+  if (animate) {
+    document.querySelectorAll("#catalog .item").forEach((el, i) => {
+      el.style.animationDelay = (i * 55) + "ms";
+    });
+  } else {
+    document.querySelectorAll("#catalog .item").forEach(el => {
+      el.style.opacity = 1; el.style.transform = "none"; el.style.animation = "none";
+    });
+  }
+
+  // door to the reserve sits after the catalog, only if there are hidden works
+  // and the chamber isn't already open
   const door = document.getElementById("vaultDoor");
-  if (door) door.addEventListener("click", showInnerLock);
+  const chamberOpen = document.getElementById("chamber").classList.contains("revealed");
+  door.style.display = (hiddenWorks.length && !chamberOpen && activeCategory === "All" && !query) ? "flex" : "none";
 
   document.getElementById("footer").innerHTML =
-    `${projects.length} works secured <span class="dot">·</span> established 2026 <span class="dot">·</span> jamesdomain.org`;
+    `${works.length} works secured <span class="dot">·</span> established 2026 <span class="dot">·</span> jamesdomain.org`;
 }
 
-build();
+function renderChamber() {
+  const groups = groupByCategory(hiddenWorks);
+  document.getElementById("chamberCatalog").innerHTML =
+    Object.keys(groups).map(cat => sectionHTML(cat, groups[cat])).join("");
+  document.querySelectorAll("#chamberCatalog .item").forEach((el, i) => {
+    el.style.animationDelay = (i * 55) + "ms";
+  });
+}
+
+// ---- wire up controls ----
+const searchInput = document.getElementById("search");
+const searchClear = document.getElementById("searchClear");
+
+searchInput.addEventListener("input", () => {
+  query = searchInput.value.trim();
+  searchClear.classList.toggle("show", query.length > 0);
+  renderCatalog(false);
+});
+searchClear.addEventListener("click", () => {
+  searchInput.value = ""; query = ""; searchClear.classList.remove("show");
+  searchInput.focus(); renderCatalog(false);
+});
+
+document.getElementById("chips").addEventListener("click", (e) => {
+  const chip = e.target.closest(".chip");
+  if (!chip) return;
+  activeCategory = chip.dataset.cat;
+  renderChips();
+  renderCatalog(false);
+});
+
+document.getElementById("vaultDoor").addEventListener("click", showInnerLock);
+
+// initial build of the (hidden until reveal) catalog + chips
+renderChips();
+renderCatalog(false);
 </script>
 </body>
 </html>
