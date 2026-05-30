@@ -1,0 +1,10 @@
+{
+  "name": "james-domain",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The Vault — a private collection portal for jamesdomain.org",
+  "type": "module",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0"
+  }
+}

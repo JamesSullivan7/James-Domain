@@ -413,6 +413,12 @@
     color: var(--oxblood); font-size: 12px; letter-spacing:.04em; text-align:center;
     min-height: 16px; margin-top: 4px;
   }
+  .mode-note {
+    text-align:center; margin-top: 14px; font-size: 10px; letter-spacing:.22em;
+    text-transform:uppercase; color: var(--faint); min-height: 13px;
+  }
+  .mode-note b { color: var(--sage); font-weight: 500; }
+  .mode-note.local b { color: var(--gold-lt); }
 </style>
 </head>
 <body>
@@ -512,6 +518,12 @@
         <input id="f-tech" type="text" placeholder="Comma-separated, e.g. React, TypeScript" autocomplete="off" />
       </div>
 
+      <div class="field" id="pwdField" style="display:none">
+        <label for="f-pwd">Curator password</label>
+        <input id="f-pwd" type="password" placeholder="Required to publish for everyone" autocomplete="off" />
+        <div class="hintline">Asked once per visit. Publishes the work so all visitors can see it.</div>
+      </div>
+
       <div class="form-err" id="formErr"></div>
       <div class="form-actions">
         <button class="ghost-btn subtle" id="formCancel">Cancel</button>
@@ -539,8 +551,9 @@
       <div class="chips" id="chips"></div>
       <div class="curator-bar">
         <button class="ghost-btn" id="addBtn">＋ Add a Work</button>
-        <button class="ghost-btn subtle" id="exportBtn">Export Collection</button>
+        <button class="ghost-btn subtle" id="exportBtn" style="display:none">Export Collection</button>
       </div>
+      <div class="mode-note" id="modeNote"></div>
     </div>
 
     <!-- category sections render here -->
@@ -716,7 +729,9 @@ function openVault() {
   document.getElementById("lockScreen").classList.add("opening");
   document.getElementById("vault").classList.add("revealed");
   activeKeypad = null;
-  renderCatalog();   // build with animations on first reveal
+  renderCatalog();   // build immediately (built-in / cached)
+  // then pull the shared collection from the database and rebuild
+  loadRemote().then(() => { renderChips(); renderCatalog(false); });
   setTimeout(() => document.getElementById("search").focus(), 900);
 }
 
@@ -740,7 +755,16 @@ function openChamber() {
    CATALOG: cards, categories, search, filters
    ============================================================ */
 
-/* ---- persistence: works you add on the site live in this browser ---- */
+/* ---- persistence ----------------------------------------------------
+   Primary store is the Supabase-backed API at /api/works, so works you
+   add are visible to EVERYONE. If that API isn't reachable (e.g. before
+   the backend is configured), we fall back to this browser's localStorage
+   so the site still works.
+   --------------------------------------------------------------------- */
+const API = "/api/works";
+let remoteMode = false;                                   // true once the database answers
+let curatorPwd = sessionStorage.getItem("vault.pwd") || ""; // remembered for the visit
+
 const STORE_KEY = "vault.works.v1";
 function loadStored() {
   try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; }
@@ -751,7 +775,37 @@ function saveStored(list) {
 }
 let storedWorks = loadStored();
 
-// the full collection = built-in works + the ones you've added here
+// pull the shared collection from the database; fall back to localStorage
+async function loadRemote() {
+  try {
+    const r = await fetch(API, { cache: "no-store" });
+    if (!r.ok) throw new Error("api");
+    const j = await r.json();
+    remoteMode = true;
+    storedWorks = (j.works || []).filter(w => !w.reserve);
+  } catch (e) {
+    remoteMode = false;
+    storedWorks = loadStored();
+  }
+  updateModeNote();
+  return remoteMode;
+}
+
+function updateModeNote() {
+  const note = document.getElementById("modeNote");
+  const exportBtn = document.getElementById("exportBtn");
+  if (remoteMode) {
+    note.className = "mode-note";
+    note.innerHTML = "Connected — added works are <b>live for everyone</b>";
+    if (exportBtn) exportBtn.style.display = "none";
+  } else {
+    note.className = "mode-note local";
+    note.innerHTML = "Offline — works save to <b>this browser only</b>";
+    if (exportBtn) exportBtn.style.display = "inline-block";
+  }
+}
+
+// the full collection = built-in works + the shared/added ones
 function allWorks() { return works.concat(storedWorks); }
 
 // keep user input from breaking the page markup
@@ -897,14 +951,33 @@ document.getElementById("chips").addEventListener("click", (e) => {
 
 document.getElementById("vaultDoor").addEventListener("click", showInnerLock);
 
-// remove a user-added work (the ✕ on its card)
-document.getElementById("catalog").addEventListener("click", (e) => {
+// remove a work (the ✕ on its card)
+document.getElementById("catalog").addEventListener("click", async (e) => {
   const x = e.target.closest("[data-remove]");
   if (!x) return;
   e.preventDefault(); e.stopPropagation();
   const id = x.dataset.remove;
-  storedWorks = storedWorks.filter(w => w.id !== id);
-  saveStored(storedWorks);
+
+  if (remoteMode) {
+    let pwd = curatorPwd || prompt("Curator password to remove this work:") || "";
+    if (!pwd) return;
+    try {
+      const r = await fetch(API + "?id=" + encodeURIComponent(id), {
+        method: "DELETE",
+        headers: { "X-Curator-Password": pwd },
+      });
+      if (r.status === 401) {
+        curatorPwd = ""; sessionStorage.removeItem("vault.pwd");
+        alert("Incorrect curator password."); return;
+      }
+      if (!r.ok) { alert("Could not remove the work."); return; }
+      curatorPwd = pwd; sessionStorage.setItem("vault.pwd", pwd);
+      storedWorks = storedWorks.filter(w => w.id !== id);
+    } catch (err) { alert("Network error — could not reach the database."); return; }
+  } else {
+    storedWorks = storedWorks.filter(w => w.id !== id);
+    saveStored(storedWorks);
+  }
   renderChips(); renderCatalog(false);
 });
 
@@ -925,17 +998,32 @@ function refreshCatList() {
     cats.map(c => `<option value="${esc(c)}"></option>`).join("");
 }
 
+const fPwd = document.getElementById("f-pwd");
+const pwdField = document.getElementById("pwdField");
+
 function openForm() {
   formErr.textContent = "";
   fName.value = ""; fUrl.value = ""; fType.value = "site";
   fStatus.value = "live"; fCategory.value = ""; fSummary.value = ""; fTech.value = "";
+  // show the password field only when we're publishing to the shared database
+  pwdField.style.display = remoteMode ? "block" : "none";
+  fPwd.value = curatorPwd;
   refreshCatList();
   formModal.classList.add("open");
   setTimeout(() => fName.focus(), 80);
 }
 function closeForm() { formModal.classList.remove("open"); }
 
-function saveForm() {
+function afterAdd() {
+  closeForm();
+  // reset filters so the new piece is visible, then rebuild
+  activeCategory = "All"; query = "";
+  searchInput.value = ""; searchClear.classList.remove("show");
+  renderChips(); renderCatalog(false);
+  chime();
+}
+
+async function saveForm() {
   const name = fName.value.trim();
   const url = fUrl.value.trim();
   if (!name) { formErr.textContent = "Please give the work a name."; fName.focus(); return; }
@@ -943,8 +1031,7 @@ function saveForm() {
   // be forgiving: prefix bare domains with https://
   const link = /^https?:\/\//i.test(url) ? url : "https://" + url;
 
-  storedWorks.push({
-    id: "u" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+  const work = {
     name,
     type: fType.value,
     url: link,
@@ -952,14 +1039,37 @@ function saveForm() {
     category: fCategory.value.trim() || "Uncategorised",
     tech: fTech.value.split(",").map(t => t.trim()).filter(Boolean),
     status: fStatus.value,
-  });
-  saveStored(storedWorks);
-  closeForm();
-  // reset filters so the new piece is visible, then rebuild
-  activeCategory = "All"; query = "";
-  searchInput.value = ""; searchClear.classList.remove("show");
-  renderChips(); renderCatalog(false);
-  chime();
+  };
+
+  if (remoteMode) {
+    const pwd = fPwd.value.trim();
+    if (!pwd) { formErr.textContent = "Enter the curator password to publish."; fPwd.focus(); return; }
+    formErr.textContent = "Publishing…";
+    try {
+      const r = await fetch(API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: pwd, work }),
+      });
+      if (r.status === 401) {
+        curatorPwd = ""; sessionStorage.removeItem("vault.pwd");
+        formErr.textContent = "Incorrect curator password."; fPwd.focus(); return;
+      }
+      if (!r.ok) { const j = await r.json().catch(() => ({})); formErr.textContent = j.error || "Could not publish."; return; }
+      const j = await r.json();
+      curatorPwd = pwd; sessionStorage.setItem("vault.pwd", pwd);
+      storedWorks.push(j.work);
+      afterAdd();
+    } catch (e) {
+      formErr.textContent = "Network error — could not reach the database.";
+    }
+  } else {
+    // localStorage fallback (database not configured / unreachable)
+    work.id = "u" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    storedWorks.push(work);
+    saveStored(storedWorks);
+    afterAdd();
+  }
 }
 
 document.getElementById("addBtn").addEventListener("click", openForm);
