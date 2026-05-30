@@ -342,6 +342,77 @@
     text-transform:uppercase; color: var(--faint);
   }
   .gallery-footer .dot { color: var(--gold); margin: 0 8px; }
+
+  /* ============================================================
+     ADD-A-WORK (curator tools)
+     ============================================================ */
+  .curator-bar { display:flex; gap: 14px; justify-content:center; margin-top: 20px; flex-wrap:wrap; }
+  .ghost-btn {
+    font-family: var(--sans); font-weight: 400; font-size: 11px;
+    letter-spacing:.26em; text-transform:uppercase; color: var(--gold-lt);
+    background: transparent; border: 1px solid var(--gold); border-radius: var(--radius);
+    padding: 11px 24px; cursor: pointer;
+    transition: background .3s ease, color .3s ease;
+  }
+  .ghost-btn:hover { background: var(--gold); color: var(--bg); }
+  .ghost-btn.subtle { color: var(--muted); border-color: var(--line); }
+  .ghost-btn.subtle:hover { background: transparent; color: var(--gold-lt); border-color: var(--gold); }
+
+  /* remove (×) badge on user-added cards */
+  .item .remove {
+    position:absolute; top: 12px; right: 12px; z-index: 3;
+    width: 24px; height: 24px; border-radius: 50%;
+    display:flex; align-items:center; justify-content:center;
+    font-family: var(--sans); font-size: 16px; line-height: 1; color: var(--muted);
+    background: rgba(12,10,9,.7); border: 1px solid var(--line);
+    opacity: 0; transition: opacity .25s ease, color .25s ease, border-color .25s ease;
+  }
+  .item:hover .remove { opacity: 1; }
+  .item .remove:hover { color: var(--oxblood); border-color: var(--oxblood); }
+
+  /* form modal */
+  #formModal {
+    position: fixed; inset: 0; z-index: 60; display:none;
+    align-items:flex-start; justify-content:center; padding: 6vh 24px;
+    background: rgba(7,5,4,.86); backdrop-filter: blur(7px); overflow-y:auto;
+  }
+  #formModal.open { display:flex; animation: fade .3s ease; }
+  .form-card {
+    position: relative; width: 520px; max-width: 100%;
+    border: 1px solid var(--line); border-radius: var(--radius);
+    background: linear-gradient(165deg, var(--panel), #0e0b09);
+    padding: 40px 44px 36px;
+  }
+  .form-card h2 {
+    font-family: var(--serif); font-weight: 500; font-size: 32px; color: var(--gold-lt);
+    text-align:center; margin-bottom: 4px;
+  }
+  .form-card .sub2 {
+    text-align:center; font-size: 11px; letter-spacing:.3em; text-transform:uppercase;
+    color: var(--muted); margin-bottom: 28px;
+  }
+  .field { margin-bottom: 18px; }
+  .field label {
+    display:block; font-size: 10px; letter-spacing:.24em; text-transform:uppercase;
+    color: var(--gold); margin-bottom: 7px;
+  }
+  .field input, .field textarea, .field select {
+    width: 100%; background: rgba(20,16,12,.5); color: var(--cream);
+    border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 12px 14px; font-family: var(--sans); font-weight: 300; font-size: 14px;
+    outline: none; transition: border-color .25s ease;
+  }
+  .field textarea { resize: vertical; min-height: 64px; }
+  .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--gold); }
+  .field .hintline { font-size: 11px; color: var(--faint); margin-top: 6px; letter-spacing:.05em; }
+  .field-row { display:flex; gap: 14px; }
+  .field-row .field { flex: 1; }
+  .form-actions { display:flex; gap: 12px; margin-top: 26px; }
+  .form-actions .ghost-btn { flex: 1; }
+  .form-err {
+    color: var(--oxblood); font-size: 12px; letter-spacing:.04em; text-align:center;
+    min-height: 16px; margin-top: 4px;
+  }
 </style>
 </head>
 <body>
@@ -387,6 +458,68 @@
     </div>
   </div>
 
+  <!-- ===================== ADD-A-WORK FORM ===================== -->
+  <div id="formModal">
+    <div class="form-card corner-frame">
+      <span class="c1"></span><span class="c2"></span>
+      <span class="close-x" id="formClose">✕</span>
+      <h2 id="formTitle">Add a Work</h2>
+      <div class="sub2">Catalog a new piece</div>
+
+      <div class="field">
+        <label for="f-name">Name</label>
+        <input id="f-name" type="text" placeholder="Project name" autocomplete="off" />
+      </div>
+
+      <div class="field">
+        <label for="f-url">Link</label>
+        <input id="f-url" type="url" placeholder="https://… (the site or the repo)" autocomplete="off" />
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="f-type">Type</label>
+          <select id="f-type">
+            <option value="site">Live Site</option>
+            <option value="repo">Repository</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-status">Status</label>
+          <select id="f-status">
+            <option value="live">Live</option>
+            <option value="experiment">Experiment</option>
+            <option value="archived">Archived</option>
+            <option value="wip">In Development</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="f-category">Category</label>
+        <input id="f-category" type="text" placeholder="e.g. Web Apps, Tools & CLIs" autocomplete="off" list="catList" />
+        <datalist id="catList"></datalist>
+        <div class="hintline">Reuse a name to group works under the same heading.</div>
+      </div>
+
+      <div class="field">
+        <label for="f-summary">Summary <span style="color:var(--faint)">(optional)</span></label>
+        <textarea id="f-summary" placeholder="A sentence or two: what it is, why it exists."></textarea>
+      </div>
+
+      <div class="field">
+        <label for="f-tech">Tech tags <span style="color:var(--faint)">(optional)</span></label>
+        <input id="f-tech" type="text" placeholder="Comma-separated, e.g. React, TypeScript" autocomplete="off" />
+      </div>
+
+      <div class="form-err" id="formErr"></div>
+      <div class="form-actions">
+        <button class="ghost-btn subtle" id="formCancel">Cancel</button>
+        <button class="ghost-btn" id="formSave">Save to Vault</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===================== THE COLLECTION ===================== -->
   <main id="vault">
     <header class="gallery-header">
@@ -404,6 +537,10 @@
         <span class="search-clear" id="searchClear">✕</span>
       </div>
       <div class="chips" id="chips"></div>
+      <div class="curator-bar">
+        <button class="ghost-btn" id="addBtn">＋ Add a Work</button>
+        <button class="ghost-btn subtle" id="exportBtn">Export Collection</button>
+      </div>
     </div>
 
     <!-- category sections render here -->
@@ -603,7 +740,26 @@ function openChamber() {
    CATALOG: cards, categories, search, filters
    ============================================================ */
 
-const GITHUB_ICON = "⌥"; // simple glyph; shown on repo badges
+/* ---- persistence: works you add on the site live in this browser ---- */
+const STORE_KEY = "vault.works.v1";
+function loadStored() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; }
+  catch (e) { return []; }
+}
+function saveStored(list) {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(list)); } catch (e) {}
+}
+let storedWorks = loadStored();
+
+// the full collection = built-in works + the ones you've added here
+function allWorks() { return works.concat(storedWorks); }
+
+// keep user input from breaking the page markup
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
 
 function cardHTML(w) {
   const s = STATUS_META[w.status] || STATUS_META.live;
@@ -612,13 +768,16 @@ function cardHTML(w) {
     ? `<span class="type-badge repo"><span class="gi">❮❯</span> Repository</span>`
     : `<span class="type-badge"><span class="gi">◍</span> Live Site</span>`;
   const tech = (w.tech && w.tech.length)
-    ? `<div class="tech">${w.tech.map(t => `<span class="t">${t}</span>`).join("")}</div>`
+    ? `<div class="tech">${w.tech.map(t => `<span class="t">${esc(t)}</span>`).join("")}</div>`
     : "";
   const cta = isRepo ? "View Repository →" : "Visit Site →";
-  return `<a class="item" href="${w.url}" target="_blank" rel="noopener">
+  const summary = w.summary ? `<p>${esc(w.summary)}</p>` : "";
+  const remove = w.id ? `<span class="remove" data-remove="${w.id}" title="Remove">✕</span>` : "";
+  return `<a class="item" href="${esc(w.url)}" target="_blank" rel="noopener">
+      ${remove}
       <div class="item-top">${badge}<span class="tag ${s.cls}">${s.label}</span></div>
-      <h3>${w.name}</h3>
-      <p>${w.summary}</p>
+      <h3>${esc(w.name)}</h3>
+      ${summary}
       ${tech}
       <div class="go">${cta}</div>
     </a>`;
@@ -659,21 +818,23 @@ function matches(w) {
 }
 
 function renderChips() {
-  const cats = ["All", ...Array.from(new Set(works.map(w => w.category)))];
+  const list = allWorks();
+  const cats = ["All", ...Array.from(new Set(list.map(w => w.category)))];
   const chips = cats.map(cat => {
-    const count = cat === "All" ? works.length : works.filter(w => w.category === cat).length;
+    const count = cat === "All" ? list.length : list.filter(w => w.category === cat).length;
     const active = cat === activeCategory ? " active" : "";
-    return `<button class="chip${active}" data-cat="${cat}">${cat}<span class="count">${count}</span></button>`;
+    return `<button class="chip${active}" data-cat="${esc(cat)}">${esc(cat)}<span class="count">${count}</span></button>`;
   }).join("");
   document.getElementById("chips").innerHTML = chips;
 }
 
 function renderCatalog(animate = true) {
-  const filtered = works.filter(matches);
+  const list = allWorks();
+  const filtered = list.filter(matches);
   const host = document.getElementById("catalog");
 
   if (!filtered.length) {
-    host.innerHTML = works.length
+    host.innerHTML = list.length
       ? `<div class="no-results">No works match your search.</div>`
       : `<div class="no-results">The collection awaits its first work.</div>`;
   } else {
@@ -698,8 +859,9 @@ function renderCatalog(animate = true) {
   const chamberOpen = document.getElementById("chamber").classList.contains("revealed");
   door.style.display = (hiddenWorks.length && !chamberOpen && activeCategory === "All" && !query) ? "flex" : "none";
 
+  const total = allWorks().length;
   document.getElementById("footer").innerHTML =
-    `${works.length} works secured <span class="dot">·</span> established 2026 <span class="dot">·</span> jamesdomain.org`;
+    `${total} ${total === 1 ? "work" : "works"} secured <span class="dot">·</span> established 2026 <span class="dot">·</span> jamesdomain.org`;
 }
 
 function renderChamber() {
@@ -734,6 +896,97 @@ document.getElementById("chips").addEventListener("click", (e) => {
 });
 
 document.getElementById("vaultDoor").addEventListener("click", showInnerLock);
+
+// remove a user-added work (the ✕ on its card)
+document.getElementById("catalog").addEventListener("click", (e) => {
+  const x = e.target.closest("[data-remove]");
+  if (!x) return;
+  e.preventDefault(); e.stopPropagation();
+  const id = x.dataset.remove;
+  storedWorks = storedWorks.filter(w => w.id !== id);
+  saveStored(storedWorks);
+  renderChips(); renderCatalog(false);
+});
+
+/* ---- the Add-a-Work form ---- */
+const formModal = document.getElementById("formModal");
+const fName = document.getElementById("f-name");
+const fUrl = document.getElementById("f-url");
+const fType = document.getElementById("f-type");
+const fStatus = document.getElementById("f-status");
+const fCategory = document.getElementById("f-category");
+const fSummary = document.getElementById("f-summary");
+const fTech = document.getElementById("f-tech");
+const formErr = document.getElementById("formErr");
+
+function refreshCatList() {
+  const cats = Array.from(new Set(allWorks().map(w => w.category).filter(Boolean)));
+  document.getElementById("catList").innerHTML =
+    cats.map(c => `<option value="${esc(c)}"></option>`).join("");
+}
+
+function openForm() {
+  formErr.textContent = "";
+  fName.value = ""; fUrl.value = ""; fType.value = "site";
+  fStatus.value = "live"; fCategory.value = ""; fSummary.value = ""; fTech.value = "";
+  refreshCatList();
+  formModal.classList.add("open");
+  setTimeout(() => fName.focus(), 80);
+}
+function closeForm() { formModal.classList.remove("open"); }
+
+function saveForm() {
+  const name = fName.value.trim();
+  const url = fUrl.value.trim();
+  if (!name) { formErr.textContent = "Please give the work a name."; fName.focus(); return; }
+  if (!url)  { formErr.textContent = "Please add a link."; fUrl.focus(); return; }
+  // be forgiving: prefix bare domains with https://
+  const link = /^https?:\/\//i.test(url) ? url : "https://" + url;
+
+  storedWorks.push({
+    id: "u" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    name,
+    type: fType.value,
+    url: link,
+    summary: fSummary.value.trim(),
+    category: fCategory.value.trim() || "Uncategorised",
+    tech: fTech.value.split(",").map(t => t.trim()).filter(Boolean),
+    status: fStatus.value,
+  });
+  saveStored(storedWorks);
+  closeForm();
+  // reset filters so the new piece is visible, then rebuild
+  activeCategory = "All"; query = "";
+  searchInput.value = ""; searchClear.classList.remove("show");
+  renderChips(); renderCatalog(false);
+  chime();
+}
+
+document.getElementById("addBtn").addEventListener("click", openForm);
+document.getElementById("formClose").addEventListener("click", closeForm);
+document.getElementById("formCancel").addEventListener("click", closeForm);
+document.getElementById("formSave").addEventListener("click", saveForm);
+formModal.addEventListener("click", (e) => { if (e.target === formModal) closeForm(); });
+formModal.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && e.target.tagName !== "TEXTAREA") { e.preventDefault(); saveForm(); }
+  if (e.key === "Escape") closeForm();
+});
+
+/* ---- Export: copy your added works as code to bake in permanently ---- */
+document.getElementById("exportBtn").addEventListener("click", () => {
+  if (!storedWorks.length) {
+    alert("You haven't added any works in this browser yet.\nUse “＋ Add a Work” first.");
+    return;
+  }
+  const clean = storedWorks.map(({ id, ...rest }) => rest);
+  const code = "const works = [\n" +
+    clean.map(w => "  " + JSON.stringify(w) + ",").join("\n") +
+    "\n];";
+  navigator.clipboard && navigator.clipboard.writeText(code).then(
+    () => alert("Copied " + clean.length + " work(s) to your clipboard as code.\n\nSend this to your developer (or paste it into index.html) to publish them so everyone can see."),
+    () => prompt("Copy your works:", code)
+  );
+});
 
 // initial build of the (hidden until reveal) catalog + chips
 renderChips();
