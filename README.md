@@ -13,7 +13,8 @@ saving in your own browser so it still works.)
 ```
 index.html        the whole front-end (keypad, catalog, search, add-a-work form)
 api/works.js      Vercel serverless function: GET / POST / DELETE works
-package.json      declares @supabase/supabase-js for the function
+api/review.js     Vercel serverless function: AI auto-fill from a link (Claude)
+package.json      declares @supabase/supabase-js and @anthropic-ai/sdk
 supabase/schema.sql   the table to create in Supabase (run once)
 ```
 
@@ -40,9 +41,11 @@ paste the contents of [`supabase/schema.sql`](supabase/schema.sql) → **Run**.
    | `SUPABASE_URL` | your Project URL |
    | `SUPABASE_SERVICE_ROLE_KEY` | your service_role key |
    | `VAULT_ADMIN_PASSWORD` | any password you choose, for adding/removing works |
+   | `ANTHROPIC_API_KEY` | *(optional)* enables AI auto-fill — from console.anthropic.com |
+   | `GITHUB_TOKEN` | *(optional)* higher GitHub rate limits / private repos |
 
 **4. Redeploy.** Vercel → Deployments → redeploy the latest (so the new env vars
-   and the `api/` function take effect).
+   and the `api/` functions take effect).
 
 That's it. Open the site, enter the vault code, and you'll see
 **"Connected — added works are live for everyone."**
@@ -60,6 +63,16 @@ Inside the vault, click **＋ Add a Work**, fill in:
 - **Curator password** — asked once per visit; publishes the work for everyone
 
 Hover a card and click the **✕** to remove it (also password-protected).
+
+### AI auto-fill (optional)
+
+If `ANTHROPIC_API_KEY` is set, the Add-a-Work form shows **✦ Auto-fill with AI**.
+Paste a GitHub repo link (or any site URL) and click it: `api/review.js` fetches
+the repo's description, language, topics, and README from the GitHub API, sends
+them to **Claude Haiku 4.5**, and fills in the name, type, summary, category
+(reusing your existing categories when they fit), and tech tags. You review and
+edit before saving. It's gated by the curator password so only you can spend API
+credits.
 
 The catalog auto-builds category sections, the search box, and the filter chips
 from whatever is in the database.

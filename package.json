@@ -5,6 +5,7 @@
   "description": "The Vault — a private collection portal for jamesdomain.org",
   "type": "module",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.69.0",
     "@supabase/supabase-js": "^2.45.0"
   }
 }

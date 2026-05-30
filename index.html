@@ -419,6 +419,19 @@
   }
   .mode-note b { color: var(--sage); font-weight: 500; }
   .mode-note.local b { color: var(--gold-lt); }
+
+  /* AI auto-fill button inside the form */
+  .ai-btn {
+    margin-top: 10px; font-family: var(--sans); font-weight: 400; font-size: 11px;
+    letter-spacing:.22em; text-transform:uppercase; color: var(--gold-lt);
+    background: rgba(201,162,39,.06); border: 1px solid var(--gold); border-radius: var(--radius);
+    padding: 9px 16px; cursor: pointer; transition: background .3s ease, color .3s ease, opacity .3s ease;
+  }
+  .ai-btn:hover { background: var(--gold); color: var(--bg); }
+  .ai-btn:disabled { opacity: .55; cursor: default; }
+  .ai-btn.working { animation: pulse 1.1s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+  .ai-note { font-size: 11px; color: var(--faint); margin-top: 7px; letter-spacing:.04em; }
 </style>
 </head>
 <body>
@@ -480,6 +493,8 @@
       <div class="field">
         <label for="f-url">Link</label>
         <input id="f-url" type="url" placeholder="https://… (the site or the repo)" autocomplete="off" />
+        <button class="ai-btn" id="aiBtn" type="button" style="display:none">✦ Auto-fill with AI</button>
+        <div class="ai-note" id="aiNote">Paste a GitHub link, then let AI draft the summary, tech &amp; category.</div>
       </div>
 
       <div class="field-row">
@@ -1005,8 +1020,10 @@ function openForm() {
   formErr.textContent = "";
   fName.value = ""; fUrl.value = ""; fType.value = "site";
   fStatus.value = "live"; fCategory.value = ""; fSummary.value = ""; fTech.value = "";
-  // show the password field only when we're publishing to the shared database
+  // show the password field + AI button only when connected to the backend
   pwdField.style.display = remoteMode ? "block" : "none";
+  document.getElementById("aiBtn").style.display = remoteMode ? "inline-block" : "none";
+  document.getElementById("aiNote").style.display = remoteMode ? "block" : "none";
   fPwd.value = curatorPwd;
   refreshCatList();
   formModal.classList.add("open");
@@ -1071,6 +1088,49 @@ async function saveForm() {
     afterAdd();
   }
 }
+
+/* ---- AI auto-fill: review a link and draft the entry ---- */
+const aiBtn = document.getElementById("aiBtn");
+aiBtn.addEventListener("click", async () => {
+  const url = fUrl.value.trim();
+  if (!url) { formErr.textContent = "Paste a link first, then auto-fill."; fUrl.focus(); return; }
+  const pwd = (fPwd.value || curatorPwd).trim();
+  if (!pwd) { formErr.textContent = "Enter the curator password to use AI."; fPwd.focus(); return; }
+
+  formErr.textContent = "";
+  const label = aiBtn.textContent;
+  aiBtn.disabled = true; aiBtn.classList.add("working"); aiBtn.textContent = "✦ Reviewing…";
+  try {
+    const categories = Array.from(new Set(allWorks().map(w => w.category).filter(Boolean)));
+    const r = await fetch("/api/review", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url, password: pwd, categories }),
+    });
+    if (r.status === 401) {
+      curatorPwd = ""; sessionStorage.removeItem("vault.pwd");
+      formErr.textContent = "Incorrect curator password."; return;
+    }
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) { formErr.textContent = j.error || "AI review failed."; return; }
+    // remember the password (it was correct) and fill the form
+    curatorPwd = pwd; sessionStorage.setItem("vault.pwd", pwd);
+    const w = j.work || {};
+    if (w.name) fName.value = w.name;
+    if (w.url) fUrl.value = w.url;
+    fType.value = w.type === "repo" ? "repo" : "site";
+    if (w.status) fStatus.value = w.status;
+    if (w.category) fCategory.value = w.category;
+    if (w.summary) fSummary.value = w.summary;
+    if (Array.isArray(w.tech)) fTech.value = w.tech.join(", ");
+    refreshCatList();
+    formErr.textContent = "Drafted — review and edit, then save.";
+  } catch (e) {
+    formErr.textContent = "Network error — could not reach the AI.";
+  } finally {
+    aiBtn.disabled = false; aiBtn.classList.remove("working"); aiBtn.textContent = label;
+  }
+});
 
 document.getElementById("addBtn").addEventListener("click", openForm);
 document.getElementById("formClose").addEventListener("click", closeForm);
