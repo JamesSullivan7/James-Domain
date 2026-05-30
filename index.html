@@ -468,54 +468,20 @@ const INNER_CODE = "4815";   // opens the private reserve
    The page builds the categories, search, and filters automatically.
    ------------------------------------------------------------ */
 const works = [
-  // ---- Web Apps ----
-  { name: "Aurora Notes", type: "site", url: "https://example.com",
-    summary: "A calm, fast notes app with end-to-end sync.",
-    category: "Web Apps", tech: ["React", "TypeScript", "Supabase"], status: "live" },
-
-  { name: "Tideline", type: "site", url: "https://example.com",
-    summary: "Surf & tide forecasting dashboard, redesigned for clarity.",
-    category: "Web Apps", tech: ["Next.js", "D3"], status: "live" },
-
-  // ---- Tools & CLIs ----
-  { name: "repo-snapshot", type: "repo", url: "https://github.com/example/repo-snapshot",
-    summary: "CLI that captures a one-page Markdown summary of any git repo.",
-    category: "Tools & CLIs", tech: ["Node", "TypeScript"], status: "live" },
-
-  { name: "dotfiles", type: "repo", url: "https://github.com/example/dotfiles",
-    summary: "My shell, editor and terminal configuration. Reproducible setup.",
-    category: "Tools & CLIs", tech: ["Shell", "Lua"], status: "live" },
-
-  // ---- Libraries ----
-  { name: "tiny-state", type: "repo", url: "https://github.com/example/tiny-state",
-    summary: "A 1kb state container for the browser. No dependencies.",
-    category: "Libraries", tech: ["TypeScript"], status: "live" },
-
-  // ---- Experiments ----
-  { name: "Lab — Shaders", type: "site", url: "https://example.com",
-    summary: "A playground of WebGL shader experiments. Rough edges, fun visuals.",
-    category: "Experiments", tech: ["WebGL", "GLSL"], status: "experiment" },
-
-  { name: "markov-poet", type: "repo", url: "https://github.com/example/markov-poet",
-    summary: "Generates oddly beautiful poetry from a corpus. A weekend toy.",
-    category: "Experiments", tech: ["Python"], status: "experiment" },
-
-  // ---- Archive ----
-  { name: "Coin Diary", type: "site", url: "https://example.com",
-    summary: "An old budgeting tool. Kept for posterity.",
-    category: "Archive", tech: ["Vue"], status: "archived" },
+  // Add your works here. Template — copy one block per project:
+  //
+  // { name: "My Project", type: "site",   // "site" or "repo"
+  //   url: "https://...",                 // live URL, or the repo URL
+  //   summary: "One or two sentences: what it is, why it exists.",
+  //   category: "Web Apps",               // any heading you like; reuse to group
+  //   tech: ["React", "TypeScript"],      // shown on the card + searchable
+  //   status: "live" },                   // "live" | "experiment" | "archived" | "wip"
 ];
 
 /* Works hidden behind the second code (in-development).
    Same fields as above. */
 const hiddenWorks = [
-  { name: "Project Cipher", type: "repo", url: "https://github.com/example/cipher",
-    summary: "Encrypted journaling app. Half-built, but looks promising.",
-    category: "In Development", tech: ["Rust", "Tauri"], status: "wip" },
-
-  { name: "Atlas", type: "site", url: "https://example.com",
-    summary: "Interactive map of everywhere I've been. Data import is still messy.",
-    category: "In Development", tech: ["MapLibre", "SvelteKit"], status: "wip" },
+  // Same shape as `works` — these live behind the Private Reserve code.
 ];
 
 /* ============================================================
@@ -707,7 +673,9 @@ function renderCatalog(animate = true) {
   const host = document.getElementById("catalog");
 
   if (!filtered.length) {
-    host.innerHTML = `<div class="no-results">No works match your search.</div>`;
+    host.innerHTML = works.length
+      ? `<div class="no-results">No works match your search.</div>`
+      : `<div class="no-results">The collection awaits its first work.</div>`;
   } else {
     const groups = groupByCategory(filtered);
     host.innerHTML = Object.keys(groups).map(cat => sectionHTML(cat, groups[cat])).join("");
