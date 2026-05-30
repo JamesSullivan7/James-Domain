@@ -66,13 +66,21 @@ Hover a card and click the **✕** to remove it (also password-protected).
 
 ### AI auto-fill (optional)
 
-If `ANTHROPIC_API_KEY` is set, the Add-a-Work form shows **✦ Auto-fill with AI**.
-Paste a GitHub repo link (or any site URL) and click it: `api/review.js` fetches
-the repo's description, language, topics, and README from the GitHub API, sends
-them to **Claude Haiku 4.5**, and fills in the name, type, summary, category
-(reusing your existing categories when they fit), and tech tags. You review and
-edit before saving. It's gated by the curator password so only you can spend API
-credits.
+If `ANTHROPIC_API_KEY` is set, the Add-a-Work form shows **✦ Auto-fill with AI**
+and a **Choose file** button.
+
+- **From a link:** paste a GitHub repo link (or any site URL) and click auto-fill.
+  `api/review.js` fetches the repo's description, language, topics, and README
+  (or the page's title/description), sends them to **Claude Haiku 4.5**, and
+  drafts the entry.
+- **From a file:** choose a **PDF, image, or text/Markdown** file (up to ~3 MB).
+  The file is stored in a Supabase Storage bucket (`vault-uploads`, created
+  automatically and **public-by-URL**), Claude reads it, and the card is filed
+  as a **Document** linking to the stored file.
+
+Either way the form fills in name, type, summary, category (reusing your existing
+categories when they fit), and tech tags for you to review before saving. It's
+gated by the curator password so only you can spend API credits.
 
 The catalog auto-builds category sections, the search box, and the filter chips
 from whatever is in the database.

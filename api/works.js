@@ -23,7 +23,7 @@ const STATUSES = ["live", "experiment", "archived", "wip"];
 function clean(work = {}) {
   return {
     name:     String(work.name || "").trim().slice(0, 120),
-    type:     work.type === "repo" ? "repo" : "site",
+    type:     ["repo", "doc"].includes(work.type) ? work.type : "site",
     url:      String(work.url || "").trim().slice(0, 500),
     summary:  String(work.summary || "").trim().slice(0, 600),
     category: (String(work.category || "").trim() || "Uncategorised").slice(0, 80),

@@ -266,6 +266,7 @@
     border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px;
   }
   .type-badge.repo { color: var(--gold-lt); border-color: rgba(201,162,39,.35); }
+  .type-badge.doc { color: var(--sage); border-color: rgba(148,160,111,.4); }
   .type-badge .gi { font-size: 11px; }
 
   .tag { font-size: 10px; letter-spacing:.24em; text-transform:uppercase; color: var(--muted); white-space:nowrap; }
@@ -420,9 +421,10 @@
   .mode-note b { color: var(--sage); font-weight: 500; }
   .mode-note.local b { color: var(--gold-lt); }
 
-  /* AI auto-fill button inside the form */
+  /* AI auto-fill row inside the form */
+  .ai-row { display:flex; gap: 10px; align-items:center; margin-top: 10px; flex-wrap:wrap; }
   .ai-btn {
-    margin-top: 10px; font-family: var(--sans); font-weight: 400; font-size: 11px;
+    font-family: var(--sans); font-weight: 400; font-size: 11px;
     letter-spacing:.22em; text-transform:uppercase; color: var(--gold-lt);
     background: rgba(201,162,39,.06); border: 1px solid var(--gold); border-radius: var(--radius);
     padding: 9px 16px; cursor: pointer; transition: background .3s ease, color .3s ease, opacity .3s ease;
@@ -431,6 +433,14 @@
   .ai-btn:disabled { opacity: .55; cursor: default; }
   .ai-btn.working { animation: pulse 1.1s ease-in-out infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+  .file-btn {
+    font-family: var(--sans); font-weight: 400; font-size: 11px;
+    letter-spacing:.22em; text-transform:uppercase; color: var(--muted);
+    border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 9px 16px; cursor: pointer; transition: border-color .3s ease, color .3s ease;
+  }
+  .file-btn:hover { border-color: var(--gold); color: var(--gold-lt); }
+  .file-btn.has-file { color: var(--sage); border-color: rgba(148,160,111,.5); }
   .ai-note { font-size: 11px; color: var(--faint); margin-top: 7px; letter-spacing:.04em; }
 </style>
 </head>
@@ -493,8 +503,14 @@
       <div class="field">
         <label for="f-url">Link</label>
         <input id="f-url" type="url" placeholder="https://… (the site or the repo)" autocomplete="off" />
-        <button class="ai-btn" id="aiBtn" type="button" style="display:none">✦ Auto-fill with AI</button>
-        <div class="ai-note" id="aiNote">Paste a GitHub link, then let AI draft the summary, tech &amp; category.</div>
+        <div class="ai-row" id="aiRow" style="display:none">
+          <button class="ai-btn" id="aiBtn" type="button">✦ Auto-fill with AI</button>
+          <label class="file-btn" id="fileBtn">
+            ⤓ Choose file
+            <input id="f-file" type="file" accept=".pdf,.txt,.md,image/*" hidden />
+          </label>
+        </div>
+        <div class="ai-note" id="aiNote">Paste a GitHub link — or choose a PDF / image / text file — then let AI draft the entry.</div>
       </div>
 
       <div class="field-row">
@@ -503,6 +519,7 @@
           <select id="f-type">
             <option value="site">Live Site</option>
             <option value="repo">Repository</option>
+            <option value="doc">Document</option>
           </select>
         </div>
         <div class="field">
@@ -833,13 +850,16 @@ function esc(s) {
 function cardHTML(w) {
   const s = STATUS_META[w.status] || STATUS_META.live;
   const isRepo = w.type === "repo";
+  const isDoc = w.type === "doc";
   const badge = isRepo
     ? `<span class="type-badge repo"><span class="gi">❮❯</span> Repository</span>`
+    : isDoc
+    ? `<span class="type-badge doc"><span class="gi">▤</span> Document</span>`
     : `<span class="type-badge"><span class="gi">◍</span> Live Site</span>`;
   const tech = (w.tech && w.tech.length)
     ? `<div class="tech">${w.tech.map(t => `<span class="t">${esc(t)}</span>`).join("")}</div>`
     : "";
-  const cta = isRepo ? "View Repository →" : "Visit Site →";
+  const cta = isRepo ? "View Repository →" : isDoc ? "Open Document →" : "Visit Site →";
   const summary = w.summary ? `<p>${esc(w.summary)}</p>` : "";
   const remove = w.id ? `<span class="remove" data-remove="${w.id}" title="Remove">✕</span>` : "";
   return `<a class="item" href="${esc(w.url)}" target="_blank" rel="noopener">
@@ -1020,10 +1040,16 @@ function openForm() {
   formErr.textContent = "";
   fName.value = ""; fUrl.value = ""; fType.value = "site";
   fStatus.value = "live"; fCategory.value = ""; fSummary.value = ""; fTech.value = "";
-  // show the password field + AI button only when connected to the backend
+  // show the password field + AI tools only when connected to the backend
   pwdField.style.display = remoteMode ? "block" : "none";
-  document.getElementById("aiBtn").style.display = remoteMode ? "inline-block" : "none";
+  document.getElementById("aiRow").style.display = remoteMode ? "flex" : "none";
   document.getElementById("aiNote").style.display = remoteMode ? "block" : "none";
+  // reset any previously chosen file
+  pickedFile = null;
+  fFile.value = "";
+  fileBtn.classList.remove("has-file");
+  fileBtn.firstChild.textContent = "⤓ Choose file";
+  aiBtn.textContent = "✦ Auto-fill with AI";
   fPwd.value = curatorPwd;
   refreshCatList();
   formModal.classList.add("open");
@@ -1089,23 +1115,61 @@ async function saveForm() {
   }
 }
 
-/* ---- AI auto-fill: review a link and draft the entry ---- */
+/* ---- AI auto-fill: review a link OR a file and draft the entry ---- */
 const aiBtn = document.getElementById("aiBtn");
+const fFile = document.getElementById("f-file");
+const fileBtn = document.getElementById("fileBtn");
+let pickedFile = null;
+
+fFile.addEventListener("change", () => {
+  pickedFile = fFile.files && fFile.files[0] ? fFile.files[0] : null;
+  if (pickedFile) {
+    if (pickedFile.size > 4 * 1024 * 1024) {
+      formErr.textContent = "That file is over ~4 MB — add larger files by link instead.";
+      pickedFile = null; fFile.value = ""; return;
+    }
+    fileBtn.classList.add("has-file");
+    fileBtn.firstChild.textContent = "⤓ " + pickedFile.name.slice(0, 28);
+    aiBtn.textContent = "✦ Scan file with AI";
+    formErr.textContent = "";
+  } else {
+    fileBtn.classList.remove("has-file");
+    fileBtn.firstChild.textContent = "⤓ Choose file";
+    aiBtn.textContent = "✦ Auto-fill with AI";
+  }
+});
+
+function readAsBase64(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(String(r.result).split(",")[1] || "");
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+
 aiBtn.addEventListener("click", async () => {
   const url = fUrl.value.trim();
-  if (!url) { formErr.textContent = "Paste a link first, then auto-fill."; fUrl.focus(); return; }
+  if (!pickedFile && !url) { formErr.textContent = "Paste a link or choose a file first."; fUrl.focus(); return; }
   const pwd = (fPwd.value || curatorPwd).trim();
   if (!pwd) { formErr.textContent = "Enter the curator password to use AI."; fPwd.focus(); return; }
 
   formErr.textContent = "";
   const label = aiBtn.textContent;
-  aiBtn.disabled = true; aiBtn.classList.add("working"); aiBtn.textContent = "✦ Reviewing…";
+  aiBtn.disabled = true; aiBtn.classList.add("working");
+  aiBtn.textContent = pickedFile ? "✦ Scanning…" : "✦ Reviewing…";
   try {
     const categories = Array.from(new Set(allWorks().map(w => w.category).filter(Boolean)));
+    const payload = { password: pwd, categories };
+    if (pickedFile) {
+      payload.file = { name: pickedFile.name, type: pickedFile.type, data: await readAsBase64(pickedFile) };
+    } else {
+      payload.url = url;
+    }
     const r = await fetch("/api/review", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url, password: pwd, categories }),
+      body: JSON.stringify(payload),
     });
     if (r.status === 401) {
       curatorPwd = ""; sessionStorage.removeItem("vault.pwd");
@@ -1113,18 +1177,19 @@ aiBtn.addEventListener("click", async () => {
     }
     const j = await r.json().catch(() => ({}));
     if (!r.ok) { formErr.textContent = j.error || "AI review failed."; return; }
-    // remember the password (it was correct) and fill the form
     curatorPwd = pwd; sessionStorage.setItem("vault.pwd", pwd);
     const w = j.work || {};
     if (w.name) fName.value = w.name;
     if (w.url) fUrl.value = w.url;
-    fType.value = w.type === "repo" ? "repo" : "site";
+    fType.value = ["repo", "doc"].includes(w.type) ? w.type : "site";
     if (w.status) fStatus.value = w.status;
     if (w.category) fCategory.value = w.category;
     if (w.summary) fSummary.value = w.summary;
     if (Array.isArray(w.tech)) fTech.value = w.tech.join(", ");
     refreshCatList();
-    formErr.textContent = "Drafted — review and edit, then save.";
+    formErr.textContent = pickedFile
+      ? "Scanned & stored — review and edit, then save."
+      : "Drafted — review and edit, then save.";
   } catch (e) {
     formErr.textContent = "Network error — could not reach the AI.";
   } finally {
