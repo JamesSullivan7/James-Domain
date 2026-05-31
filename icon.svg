@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <!-- dark vault background -->
+    <radialGradient id="bg" cx="50%" cy="38%" r="75%">
+      <stop offset="0%"  stop-color="#211b14"/>
+      <stop offset="55%" stop-color="#100d0a"/>
+      <stop offset="100%" stop-color="#0a0807"/>
+    </radialGradient>
+
+    <!-- brushed-metal gold gradient for the V face -->
+    <linearGradient id="metal" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#fff4cf"/>
+      <stop offset="18%"  stop-color="#e8c869"/>
+      <stop offset="42%"  stop-color="#b8922f"/>
+      <stop offset="58%"  stop-color="#8a6a1e"/>
+      <stop offset="78%"  stop-color="#d8b252"/>
+      <stop offset="100%" stop-color="#f6e6b0"/>
+    </linearGradient>
+
+    <!-- diagonal sheen sweeping across the metal -->
+    <linearGradient id="sheen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="22%"  stop-color="#ffffff" stop-opacity="0.05"/>
+      <stop offset="50%"  stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="78%"  stop-color="#000000" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.28"/>
+    </linearGradient>
+
+    <!-- bevel edge highlight -->
+    <linearGradient id="edge" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#fff7da"/>
+      <stop offset="100%" stop-color="#7a5d1c"/>
+    </linearGradient>
+
+    <filter id="drop" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#000000" flood-opacity="0.55"/>
+    </filter>
+  </defs>
+
+  <!-- rounded-square plate -->
+  <rect x="0" y="0" width="512" height="512" rx="112" fill="url(#bg)"/>
+  <!-- thin gold frame -->
+  <rect x="22" y="22" width="468" height="468" rx="92" fill="none" stroke="#caa53033" stroke-width="2"/>
+  <rect x="34" y="34" width="444" height="444" rx="82" fill="none" stroke="#e6c96522" stroke-width="1"/>
+
+  <!-- the metal V -->
+  <g filter="url(#drop)">
+    <!-- darker back edge, offset to fake thickness -->
+    <path d="M120 138 L256 396 L392 138 L330 138 L256 282 L182 138 Z"
+          transform="translate(5,8)" fill="url(#edge)" opacity="0.85"/>
+    <!-- V face -->
+    <path d="M120 138 L256 396 L392 138 L330 138 L256 282 L182 138 Z"
+          fill="url(#metal)" stroke="#6e521a" stroke-width="2"/>
+    <!-- sheen overlay clipped to the V -->
+    <path d="M120 138 L256 396 L392 138 L330 138 L256 282 L182 138 Z"
+          fill="url(#sheen)"/>
+    <!-- top inner highlight on each limb -->
+    <path d="M126 146 L184 146 L176 162 L134 162 Z" fill="#fff7d8" opacity="0.7"/>
+    <path d="M328 146 L386 146 L378 162 L336 162 Z" fill="#fff7d8" opacity="0.55"/>
+  </g>
+</svg>
